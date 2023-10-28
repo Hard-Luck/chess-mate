@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // target version of ECMAScript
+    "module": "commonjs", // module system
+    "outDir": "./dist", // output directory
+    "rootDir": "./src", // source directory
+    "strict": true, // enable strict type checking options
+    "esModuleInterop": true, // interoperability between commonjs and ES modules
+    "skipLibCheck": true, // skip checking declaration files
+    "forceConsistentCasingInFileNames": true, // enforce consistent file naming
+    "baseUrl": "./", // base URL for resolving module names and paths
+    "paths": {
+      // set up alias for the src directory
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/*.ts"],
+  "exclude": ["node_modules"]
+}
