@@ -93,3 +93,5 @@ export class King extends Piece {
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;
   }
 }
+
+
