@@ -72,3 +72,24 @@ export class Knight extends Piece {
     );
   }
 }
+
+export class Bishop extends Piece {
+  canMoveTo(position: Position) {
+    const { rank, file } = this.currentPosition.distanceFrom(position);
+    return Math.abs(rank) === Math.abs(file);
+  }
+}
+
+export class Queen extends Piece {
+  canMoveTo(position: Position): boolean {
+    const { rank, file } = this.currentPosition.distanceFrom(position);
+    return Math.abs(rank) === Math.abs(file) || rank === 0 || file === 0;
+  }
+}
+
+export class King extends Piece {
+  canMoveTo(position: Position): boolean {
+    const { rank, file } = this.currentPosition.distanceFrom(position);
+    return Math.abs(rank) <= 1 && Math.abs(file) <= 1;
+  }
+}
