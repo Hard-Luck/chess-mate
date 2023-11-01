@@ -1,7 +1,7 @@
 import { King, Knight, Bishop, Pawn, Queen, Rook } from "./pieces";
 import Position from "./position";
 
-type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
+export type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
 
 type Board = Piece[][];
 

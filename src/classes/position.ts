@@ -9,7 +9,7 @@ class Position {
   private fileToNumber(file: PositionFile) {
     return "ABCDEFGH".indexOf(file) + 1;
   }
-  
+
   public distanceFrom(position: Position) {
     const currentFileAsNumber = this.fileToNumber(this.file);
     const otherFileAsNumber = this.fileToNumber(position.file);

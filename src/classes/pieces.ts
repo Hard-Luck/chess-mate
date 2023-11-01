@@ -4,7 +4,7 @@ abstract class Piece {
   private position: Position;
   private color: "black" | "white";
   private captured: boolean;
-
+  abstract type: string;
   constructor(
     color: "black" | "white",
     file: PositionFile,
@@ -43,6 +43,7 @@ abstract class Piece {
 }
 
 export class Pawn extends Piece {
+  type = "pawn";
   canMoveTo(position: Position) {
     const startRank = this.pieceColor === "white" ? 2 : 7;
     const forward = this.pieceColor === "white" ? 1 : -1;
@@ -55,6 +56,7 @@ export class Pawn extends Piece {
 }
 
 export class Rook extends Piece {
+  type = "rook";
   canMoveTo(position: Position) {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return rank === 0 || file === 0;
@@ -62,6 +64,7 @@ export class Rook extends Piece {
 }
 
 export class Knight extends Piece {
+  type = "knight";
   canMoveTo(position: Position) {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     const absoluteRank = Math.abs(rank);
@@ -74,6 +77,7 @@ export class Knight extends Piece {
 }
 
 export class Bishop extends Piece {
+  type = "bishop";
   canMoveTo(position: Position) {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) === Math.abs(file);
@@ -81,6 +85,7 @@ export class Bishop extends Piece {
 }
 
 export class Queen extends Piece {
+  type = "queen";
   canMoveTo(position: Position): boolean {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) === Math.abs(file) || rank === 0 || file === 0;
@@ -88,6 +93,7 @@ export class Queen extends Piece {
 }
 
 export class King extends Piece {
+  type = "king";
   canMoveTo(position: Position): boolean {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;

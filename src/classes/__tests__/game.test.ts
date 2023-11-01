@@ -1,15 +1,7 @@
 import Game from "@/classes/game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
 
-describe("Game", () => {
-  it("should set up pieces in starting positions", () => {
-    const game = new Game();
-    console.table(game.state);
-    expect(game.state).toMatchObject(startingPositions);
-  });
-});
-
-var startingPositions = [
+const startingPositions = [
   [
     new Rook("white", "A", 1),
     new Knight("white", "B", 1),
@@ -57,3 +49,11 @@ var startingPositions = [
     new Rook("black", "H", 8),
   ],
 ];
+
+describe("Game", () => {
+  it("should set up pieces in starting positions", () => {
+    const game = new Game();
+    console.table(game.state);
+    expect(game.state).toMatchObject(startingPositions);
+  });
+});
