@@ -2,7 +2,7 @@ import { King, Knight, Bishop, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionFile, PositionRank } from "./position";
 
 export type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
-type ShorthandPosition = [PositionFile, PositionRank];
+export type ShorthandPosition = [PositionFile, PositionRank];
 type Board = Piece[][];
 
 export default class Game {
@@ -71,6 +71,12 @@ export default class Game {
   get mostRecentMove() {
     return this.lastMove;
   }
+  get turnNumber() {
+    return this.turn;
+  }
+  get turnColor() {
+    return this.playerTurn;
+  }
   public makeMove(
     startPosition: ShorthandPosition,
     endPosition: ShorthandPosition
@@ -82,12 +88,13 @@ export default class Game {
     const pieceToMove = this.board[startFile - 1][startRankAsNumber];
     if (!pieceToMove || pieceToMove.pieceColor !== this.playerTurn) {
       throw new Error("Not your turn");
-    } else {
-      const position = new Position(endRank, endFile);
-      pieceToMove.moveTo(position);
-      this.board[endFile - 1][endRankAsNumber] = pieceToMove;
-      this.board[startFile - 1][startRankAsNumber] = null;
     }
+    const position = new Position(endRank, endFile);
+    pieceToMove.moveTo(position);
+    this.board[endFile - 1][endRankAsNumber] = pieceToMove;
+    this.board[startFile - 1][startRankAsNumber] = null;
+    this.playerTurn = this.playerTurn === "black" ? "white" : "black";
+    if (this.playerTurn === "white") ++this.turn;
     return [...this.board];
   }
 }

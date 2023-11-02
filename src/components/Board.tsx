@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Game from "../classes/game";
+import Game, { ShorthandPosition } from "../classes/game";
 import type { PositionFile, PositionRank } from "../classes/position";
 import Square from "./Square";
 
@@ -29,7 +29,15 @@ function Board() {
       <div
         className={`grid grid-cols-8 w-4/5 mx-auto`}
         onMouseDown={(e) => {
-          console.log((e.target as HTMLElement).dataset.location);
+          const startLocation = (e.target as HTMLElement).dataset.location;
+          if (!startLocation) return;
+          const pos = [
+            startLocation[0],
+            +startLocation[1],
+          ] as ShorthandPosition;
+          const end = [pos[0], pos[1] + 1] as ShorthandPosition;
+          const newBoard = game.makeMove(pos, end);
+          setBoard(newBoard);
         }}>
         {board
           .slice()

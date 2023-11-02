@@ -56,4 +56,19 @@ describe("Game", () => {
     console.table(game.state);
     expect(game.state).toMatchObject(startingPositions);
   });
+  test("turn number defaults to 1", () => {
+    const game = new Game();
+    expect(game.turnNumber).toBe(1);
+  });
+  it("should change move colour after a move is made", () => {
+    const game = new Game();
+    game.makeMove(["A", 2], ["A", 4]);
+    expect(game.turnColor).toBe("black");
+  });
+  it("should increase turn number after a pair of moves", () => {
+    const game = new Game();
+    game.makeMove(["A", 2], ["A", 4]);
+    game.makeMove(["A", 7], ["A", 5]);
+    expect(game.turnNumber).toBe(2);
+  });
 });
