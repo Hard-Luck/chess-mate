@@ -23,9 +23,14 @@ function Board() {
     const newBoard = game.makeMove(["A", 2], ["A", 4]);
     setBoard(newBoard);
   }
+
   return (
     <>
-      <div className="grid grid-cols-8 w-4/5 max-w-screen-md mx-auto">
+      <div
+        className={`grid grid-cols-8 w-4/5 mx-auto`}
+        onMouseDown={(e) => {
+          console.log((e.target as HTMLElement).dataset.location);
+        }}>
         {board
           .slice()
           .reverse()

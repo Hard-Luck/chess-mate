@@ -14,12 +14,18 @@ function Square({ file, rank, piece, size }: SquareProps) {
   const imgUrl = piece ? `pieces/${piece.pieceColor}/${piece.type}.png` : null;
   return (
     <div
+      data-location={`${file}${rank}`}
       style={{ width: `${size}px`, height: `${size}px` }}
       className={`flex items-center justify-center ${
         isDark ? "bg-black" : "bg-white"
       }`}>
       {imgUrl ? (
-        <img className="w-3/4 h-3/4" src={imgUrl} alt={piece?.type} />
+        <img
+          className="w-3/4 h-3/4"
+          data-location={`${file}${rank}`}
+          src={imgUrl}
+          alt={piece?.type}
+        />
       ) : null}
     </div>
   );
