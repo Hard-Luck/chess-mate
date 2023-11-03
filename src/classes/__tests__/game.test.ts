@@ -1,5 +1,6 @@
 import Game from "@/classes/game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
+import Position from "../position";
 
 const startingPositions = [
   [
@@ -62,13 +63,20 @@ describe("Game", () => {
   });
   it("should change move colour after a move is made", () => {
     const game = new Game();
-    game.makeMove(["A", 2], ["A", 4]);
+    game.makeMove(new Position("A", 2), new Position("A", 4));
     expect(game.turnColor).toBe("black");
   });
   it("should increase turn number after a pair of moves", () => {
     const game = new Game();
-    game.makeMove(["A", 2], ["A", 4]);
-    game.makeMove(["A", 7], ["A", 5]);
+    game.makeMove(new Position("A", 2), new Position("A", 4));
+    game.makeMove(new Position("A", 7), new Position("A", 5));
     expect(game.turnNumber).toBe(2);
+  });
+  test("Piece should move to new position on the board", () => {
+    const game = new Game();
+    const a2Pawn = game.state[1][0];
+    game.makeMove(new Position("A", 2), new Position("A", 4));
+    expect(a2Pawn?.currentPosition).toEqual(new Position("A", 4));
+    expect(game.state[1][0]).toBeNull();
   });
 });

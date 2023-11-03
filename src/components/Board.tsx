@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import Game, { ShorthandPosition } from "../classes/game";
 import type { PositionFile, PositionRank } from "../classes/position";
 import Square from "./Square";
+import useGame from "@/hooks/useGame";
 
 function Board() {
-  const [game, setGame] = useState(new Game());
-  const [board, setBoard] = useState(game.state);
+  const { board, resetGame, move, selectSquare } = useGame();
   const [size, setSize] = useState(window.innerWidth * 0.1);
 
   useEffect(() => {
@@ -14,31 +13,11 @@ function Board() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  function resetGame() {
-    const newGame = new Game();
-    setBoard(() => newGame.state);
-    setGame(() => newGame);
-  }
-  function move() {
-    const newBoard = game.makeMove(["A", 2], ["A", 4]);
-    setBoard(newBoard);
-  }
-
   return (
     <>
       <div
         className={`grid grid-cols-8 w-4/5 mx-auto`}
-        onMouseDown={(e) => {
-          const startLocation = (e.target as HTMLElement).dataset.location;
-          if (!startLocation) return;
-          const pos = [
-            startLocation[0],
-            +startLocation[1],
-          ] as ShorthandPosition;
-          const end = [pos[0], pos[1] + 1] as ShorthandPosition;
-          const newBoard = game.makeMove(pos, end);
-          setBoard(newBoard);
-        }}>
+        onMouseDown={selectSquare}>
         {board
           .slice()
           .reverse()

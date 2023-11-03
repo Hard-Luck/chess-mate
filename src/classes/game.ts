@@ -77,22 +77,19 @@ export default class Game {
   get turnColor() {
     return this.playerTurn;
   }
-  public makeMove(
-    startPosition: ShorthandPosition,
-    endPosition: ShorthandPosition
-  ) {
-    const [startRank, startFile] = startPosition;
-    const [endRank, endFile] = endPosition;
-    const startRankAsNumber = "ABCDEFGH".indexOf(startRank);
-    const endRankAsNumber = "ABCDEFGH".indexOf(endRank);
-    const pieceToMove = this.board[startFile - 1][startRankAsNumber];
+  public makeMove(startPosition: Position, endPosition: Position) {
+    const startFileAsNumber = "ABCDEFGH".indexOf(startPosition.currentFile);
+    const endFileAsNumber = "ABCDEFGH".indexOf(endPosition.currentFile);
+    const pieceToMove =
+      this.board[startPosition.currentRank - 1][startFileAsNumber];
+    console.log(pieceToMove);
+
     if (!pieceToMove || pieceToMove.pieceColor !== this.playerTurn) {
-      throw new Error("Not your turn");
+      throw new Error(`${!pieceToMove}`);
     }
-    const position = new Position(endRank, endFile);
-    pieceToMove.moveTo(position);
-    this.board[endFile - 1][endRankAsNumber] = pieceToMove;
-    this.board[startFile - 1][startRankAsNumber] = null;
+    pieceToMove.moveTo(endPosition);
+    this.board[endPosition.currentRank - 1][endFileAsNumber] = pieceToMove;
+    this.board[startPosition.currentRank - 1][startFileAsNumber] = null;
     this.playerTurn = this.playerTurn === "black" ? "white" : "black";
     if (this.playerTurn === "white") ++this.turn;
     return [...this.board];

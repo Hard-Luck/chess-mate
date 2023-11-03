@@ -23,6 +23,12 @@ class Position {
   get currentRank() {
     return this.rank;
   }
+  static from(file: string, rank: number | string) {
+    if ("ABCDEFGH".indexOf(file) === -1) throw new Error("bad file");
+    if (typeof rank === "string") rank = +rank;
+    if (rank < 1 || rank > 8) throw new Error("bad rank");
+    return new Position(file as PositionFile, rank as PositionRank);
+  }
 }
 
 export default Position;
