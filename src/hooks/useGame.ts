@@ -29,6 +29,6 @@ function useGame() {
       }
     }
   }
-  return { board, resetGame, move, selectSquare };
+  return { board, resetGame, selectSquare };
 }
 export default useGame;

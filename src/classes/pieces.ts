@@ -1,5 +1,5 @@
 import Position, { PositionFile, PositionRank } from "@/classes/position";
-
+import Game from "./game";
 abstract class Piece {
   private position: Position;
   private color: "black" | "white";
@@ -31,10 +31,10 @@ abstract class Piece {
     this.captured = isCaptured;
   }
 
-  abstract canMoveTo(position: Position): boolean;
+  abstract canMoveTo(position: Position, game?: Game): boolean;
 
-  moveTo(newPosition: Position) {
-    if (this.canMoveTo(newPosition)) {
+  moveTo(newPosition: Position, game?: Game) {
+    if (this.canMoveTo(newPosition, game)) {
       this.position = newPosition;
     } else {
       throw new Error("Cannot move here");
@@ -44,10 +44,18 @@ abstract class Piece {
 
 export class Pawn extends Piece {
   type = "pawn";
-  canMoveTo(position: Position) {
+  canMoveTo(position: Position, game?: Game) {
     const startRank = this.pieceColor === "white" ? 2 : 7;
     const forward = this.pieceColor === "white" ? 1 : -1;
     const { rank, file } = this.currentPosition.distanceFrom(position);
+    const attemptedCapture = Math.abs(file) === 1 && rank === forward;
+    if (attemptedCapture) {
+      if (!game) throw Error("No board passed");
+      const pieceOnCapturingSquare = game.getPieceFromPosition(position);
+      if (pieceOnCapturingSquare?.pieceColor !== this.pieceColor) return true;
+      return false;
+    }
+    if (game && game?.getPieceFromPosition(position) !== null) return false;
     if (this.currentPosition.currentRank === startRank) {
       return (rank === forward || rank === forward * 2) && file === 0;
     }

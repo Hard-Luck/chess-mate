@@ -3,11 +3,12 @@ import Position, { PositionFile, PositionRank } from "./position";
 
 export type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
 export type ShorthandPosition = [PositionFile, PositionRank];
-type Board = Piece[][];
+export type Board = Piece[][];
+export type Move = [Position, Position];
 
 export default class Game {
   private board: Board;
-  private lastMove: [Position, Position] | null;
+  private lastMove: Move | null;
   private turn: number;
   private playerTurn: "white" | "black";
   constructor() {
@@ -77,20 +78,30 @@ export default class Game {
   get turnColor() {
     return this.playerTurn;
   }
+  get previousMove() {
+    return this.lastMove;
+  }
+  public getPieceFromPosition(position: Position) {
+    const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
+    return this.board[position.currentRank - 1][fileAsNumber];
+  }
+  private setPosition(position: Position, piece: Piece) {
+    const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
+    this.board[position.currentRank - 1][fileAsNumber] = piece;
+  }
   public makeMove(startPosition: Position, endPosition: Position) {
-    const startFileAsNumber = "ABCDEFGH".indexOf(startPosition.currentFile);
-    const endFileAsNumber = "ABCDEFGH".indexOf(endPosition.currentFile);
-    const pieceToMove =
-      this.board[startPosition.currentRank - 1][startFileAsNumber];
-
+    const pieceToMove = this.getPieceFromPosition(startPosition);
     if (!pieceToMove || pieceToMove.pieceColor !== this.playerTurn) {
       throw new Error(`${!pieceToMove}`);
     }
-    pieceToMove.moveTo(endPosition);
-    this.board[endPosition.currentRank - 1][endFileAsNumber] = pieceToMove;
-    this.board[startPosition.currentRank - 1][startFileAsNumber] = null;
+    const endPiece = this.getPieceFromPosition(endPosition);
+    pieceToMove.moveTo(endPosition, this);
+    if (endPiece) endPiece.isCaptured = true;
+    this.setPosition(endPosition, pieceToMove);
+    this.setPosition(startPosition, null);
     this.playerTurn = this.playerTurn === "black" ? "white" : "black";
     if (this.playerTurn === "white") ++this.turn;
+    this.lastMove = [startPosition, endPosition];
     return [...this.board];
   }
 }

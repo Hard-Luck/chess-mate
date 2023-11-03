@@ -54,7 +54,6 @@ const startingPositions = [
 describe("Game", () => {
   it("should set up pieces in starting positions", () => {
     const game = new Game();
-    console.table(game.state);
     expect(game.state).toMatchObject(startingPositions);
   });
   test("turn number defaults to 1", () => {
@@ -78,5 +77,18 @@ describe("Game", () => {
     game.makeMove(new Position("A", 2), new Position("A", 4));
     expect(a2Pawn?.currentPosition).toEqual(new Position("A", 4));
     expect(game.state[1][0]).toBeNull();
+  });
+  test("update last move after a move is taken", () => {
+    const game = new Game();
+    game.makeMove(new Position("A", 2), new Position("A", 4));
+    expect(game.previousMove).toEqual([
+      new Position("A", 2),
+      new Position("A", 4),
+    ]);
+    game.makeMove(new Position("A", 7), new Position("A", 5));
+    expect(game.previousMove).toEqual([
+      new Position("A", 7),
+      new Position("A", 5),
+    ]);
   });
 });
