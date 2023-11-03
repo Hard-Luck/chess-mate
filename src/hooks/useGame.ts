@@ -5,25 +5,29 @@ import { useState } from "react";
 function useGame() {
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
+  const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
 
   function resetGame() {
     const newGame = new Game();
     setBoard(() => newGame.state);
     setGame(() => newGame);
+    setSelectedSquare(null);
   }
-  function move() {
-    const newBoard = game.makeMove(new Position("A", 2), new Position("A", 4));
-    setBoard(newBoard);
-  }
-  function selectSquare(e: React.MouseEvent<HTMLElement>) {
-    const startLocation = (e.target as HTMLElement).dataset.location;
-    if (!startLocation) return;
-    const pos = Position.from(startLocation[0], startLocation[1]);
-    const end = Position.from(startLocation[0], +startLocation[1] + 1);
-    console.log(pos, end);
-
-    const newBoard = game.makeMove(pos, end);
-    setBoard(newBoard);
+  function selectSquare(e: React.MouseEvent) {
+    const square = (e.target as HTMLElement).dataset.location;
+    if (!square) return;
+    const position = Position.from(square[0], square[1]);
+    if (selectedSquare === null) {
+      setSelectedSquare(position);
+    } else {
+      try {
+        const newBoard = game.makeMove(selectedSquare, position);
+        setSelectedSquare(null);
+        setBoard(newBoard);
+      } catch (err) {
+        setSelectedSquare(null);
+      }
+    }
   }
   return { board, resetGame, move, selectSquare };
 }

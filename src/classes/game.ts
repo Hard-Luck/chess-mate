@@ -82,7 +82,6 @@ export default class Game {
     const endFileAsNumber = "ABCDEFGH".indexOf(endPosition.currentFile);
     const pieceToMove =
       this.board[startPosition.currentRank - 1][startFileAsNumber];
-    console.log(pieceToMove);
 
     if (!pieceToMove || pieceToMove.pieceColor !== this.playerTurn) {
       throw new Error(`${!pieceToMove}`);

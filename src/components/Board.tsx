@@ -4,7 +4,7 @@ import Square from "./Square";
 import useGame from "@/hooks/useGame";
 
 function Board() {
-  const { board, resetGame, move, selectSquare } = useGame();
+  const { board, resetGame, selectSquare } = useGame();
   const [size, setSize] = useState(window.innerWidth * 0.1);
 
   useEffect(() => {
@@ -40,9 +40,6 @@ function Board() {
       <div className="flex justify-center">
         <button onClick={resetGame} className="m-2 p-2 bg-blue-500 text-white">
           Reset
-        </button>
-        <button onClick={move} className="m-2 p-2 bg-blue-500 text-white">
-          Test Move
         </button>
       </div>
     </>
