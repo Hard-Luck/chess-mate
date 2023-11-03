@@ -6,7 +6,7 @@ function useGame() {
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
-
+  const turnColor = game.turnColor;
   function resetGame() {
     const newGame = new Game();
     setBoard(() => newGame.state);
@@ -17,8 +17,9 @@ function useGame() {
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
     const position = Position.from(square[0], square[1]);
+    const piece = game.getPieceFromPosition(position);
     if (selectedSquare === null) {
-      setSelectedSquare(position);
+      if (piece?.pieceColor === game.turnColor) setSelectedSquare(position);
     } else {
       try {
         const newBoard = game.makeMove(selectedSquare, position);
@@ -29,6 +30,6 @@ function useGame() {
       }
     }
   }
-  return { board, resetGame, selectSquare };
+  return { board, resetGame, selectSquare, turnColor };
 }
 export default useGame;

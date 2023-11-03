@@ -41,5 +41,19 @@ describe("Capturing", () => {
       game.makeMove(new Position("A", 7), new Position("A", 5));
       expect(whitePawn?.canMoveTo(new Position("A", 5), game)).toBe(false);
     });
+    it("shouldn't be able to jump over a piece", () => {
+      const game = new Game();
+      const whiteStartingPosition = new Position("A", 2);
+      const whitePawn = game.getPieceFromPosition(whiteStartingPosition);
+      // Move black pawn to A3 to attempt to jump over to A4 while moving H -pawn just to take turn
+      game.makeMove(new Position("H", 2), new Position("H", 3));
+      game.makeMove(new Position("A", 7), new Position("A", 5));
+      game.makeMove(new Position("H", 3), new Position("H", 4));
+      game.makeMove(new Position("A", 5), new Position("A", 4));
+      game.makeMove(new Position("H", 4), new Position("H", 5));
+      game.makeMove(new Position("A", 4), new Position("A", 3));
+
+      expect(whitePawn?.canMoveTo(new Position("A", 4), game)).toBe(false);
+    });
   });
 });

@@ -52,8 +52,20 @@ export class Pawn extends Piece {
     if (attemptedCapture) {
       if (!game) throw Error("No board passed");
       const pieceOnCapturingSquare = game.getPieceFromPosition(position);
-      if (pieceOnCapturingSquare?.pieceColor !== this.pieceColor) return true;
+      if (
+        pieceOnCapturingSquare &&
+        pieceOnCapturingSquare?.pieceColor !== this.pieceColor
+      )
+        return true;
       return false;
+    }
+    if (Math.abs(rank) === 2) {
+      const oneSpaceAhead = new Position(
+        position.currentFile,
+        (position.currentRank - forward) as PositionRank
+      );
+      const pieceBetweenCheck = game?.getPieceFromPosition(oneSpaceAhead);
+      if (pieceBetweenCheck) return false;
     }
     if (game && game?.getPieceFromPosition(position) !== null) return false;
     if (this.currentPosition.currentRank === startRank) {

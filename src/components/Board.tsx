@@ -4,11 +4,10 @@ import Square from "./Square";
 import useGame from "@/hooks/useGame";
 
 function Board() {
-  const { board, resetGame, selectSquare } = useGame();
+  const { board, resetGame, selectSquare, turnColor } = useGame();
   const [size, setSize] = useState(
     Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
   );
-
   useEffect(() => {
     const handleResize = () => {
       const newSize = Math.min(
@@ -52,6 +51,7 @@ function Board() {
         <button onClick={resetGame} className="m-2 p-2 bg-blue-500 text-white">
           Reset
         </button>
+        <p>{turnColor} to play</p>
       </div>
     </>
   );
