@@ -5,18 +5,29 @@ import useGame from "@/hooks/useGame";
 
 function Board() {
   const { board, resetGame, selectSquare } = useGame();
-  const [size, setSize] = useState(window.innerWidth * 0.1);
+  const [size, setSize] = useState(
+    Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
+  );
 
   useEffect(() => {
-    const handleResize = () => setSize(window.innerWidth * 0.1);
+    const handleResize = () => {
+      const newSize = Math.min(
+        window.innerWidth * 0.1,
+        window.innerHeight * 0.1
+      );
+      setSize(newSize);
+    };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const boardSize = size * 8;
+
   return (
     <>
       <div
-        className={`grid grid-cols-8 w-4/5 mx-auto`}
+        className={`grid grid-cols-8`}
+        style={{ width: boardSize, height: boardSize, margin: "auto" }}
         onMouseDown={selectSquare}>
         {board
           .slice()
