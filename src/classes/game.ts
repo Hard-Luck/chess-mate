@@ -96,7 +96,10 @@ export default class Game {
     }
     const endPiece = this.getPieceFromPosition(endPosition);
     pieceToMove.moveTo(endPosition, this);
-    if (endPiece) endPiece.isCaptured = true;
+    if (endPiece?.pieceColor === pieceToMove.pieceColor) {
+      throw new Error("Cannot capture own piece");
+    }
+    endPiece && (endPiece.isCaptured = true);
     this.setPosition(endPosition, pieceToMove);
     this.setPosition(startPosition, null);
     this.playerTurn = this.playerTurn === "black" ? "white" : "black";

@@ -55,5 +55,14 @@ describe("Capturing", () => {
 
       expect(whitePawn?.canMoveTo(new Position("A", 4), game)).toBe(false);
     });
+    test("shouldn't be able to move onto square where you're own piece is", () => {
+      const game = new Game();
+      game.makeMove(new Position("F", 2), new Position("F", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      const whiteKnight = game.getPieceFromPosition(new Position("G", 1));
+      expect(() =>
+        game.makeMove(whiteKnight!.currentPosition, new Position("F", 3))
+      ).toThrow();
+    });
   });
 });
