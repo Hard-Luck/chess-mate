@@ -1,4 +1,8 @@
-import Position, { PositionFile, PositionRank } from "@/classes/position";
+import Position, {
+  Distance,
+  PositionFile,
+  PositionRank,
+} from "@/classes/position";
 import Game from "./game";
 abstract class Piece {
   private position: Position;
@@ -32,7 +36,61 @@ abstract class Piece {
   }
 
   abstract canMoveTo(position: Position, game?: Game): boolean;
+  private getFileAsIndex(file: PositionFile) {
+    const files = "ABCDEFGH";
+    const fileAsNum = files.indexOf(file);
+    return fileAsNum;
+  }
+  private fileFromIndex(index: number) {
+    const files = "ABCDEFGH";
+    return files[index];
+  }
+  checkFile(distance: number, game: Game) {
+    const direction = distance > 0 ? 1 : -1;
+    const file = this.currentPosition.currentFile;
+    const startRank = this.currentPosition.currentRank;
+    for (let i = 1; i < Math.abs(distance); i += 1) {
+      if (
+        game.getPieceFromPosition(
+          Position.from(file, startRank + i * direction)
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+  checkRank(distance: number, game: Game) {
+    const direction = distance > 0 ? 1 : -1;
+    const rank = this.currentPosition.currentRank;
+    const file = this.currentPosition.currentFile;
 
+    for (let i = 1; i < Math.abs(distance); i += 1) {
+      const fileAsNum = this.getFileAsIndex(file);
+      const fileToCheck = this.fileFromIndex(fileAsNum + i * direction);
+      if (game.getPieceFromPosition(Position.from(fileToCheck, rank))) {
+        return false;
+      }
+    }
+    return true;
+  }
+  checkDiagonal(distance: Distance, game: Game) {
+    const { rank, file } = distance;
+    const absoluteDifference = Math.abs(rank);
+    const fileIndex = this.getFileAsIndex(this.currentPosition.currentFile);
+    const rankIndex = this.currentPosition.currentRank;
+    const rankUnits = rank / absoluteDifference;
+    const fileUnits = file / absoluteDifference;
+    for (let i = 1; i < absoluteDifference; i++) {
+      const fileToCheck = this.fileFromIndex(fileIndex + i * fileUnits);
+      const rankToCheck = rankIndex + i * rankUnits;
+      const positionToCheck = Position.from(fileToCheck, rankToCheck);
+      if (game.getPieceFromPosition(positionToCheck)) {
+        return false;
+      }
+    }
+    return true;
+  }
   moveTo(newPosition: Position, game?: Game) {
     if (this.canMoveTo(newPosition, game)) {
       this.position = newPosition;
@@ -77,9 +135,16 @@ export class Pawn extends Piece {
 
 export class Rook extends Piece {
   type = "rook";
-  canMoveTo(position: Position) {
+  canMoveTo(position: Position, game: Game) {
     const { rank, file } = this.currentPosition.distanceFrom(position);
-    return rank === 0 || file === 0;
+    if (file === 0) {
+      const check = this.checkFile(rank, game);
+      return check;
+    }
+    if (rank === 0) {
+      return this.checkRank(file, game);
+    }
+    return false;
   }
 }
 
@@ -98,17 +163,27 @@ export class Knight extends Piece {
 
 export class Bishop extends Piece {
   type = "bishop";
-  canMoveTo(position: Position) {
-    const { rank, file } = this.currentPosition.distanceFrom(position);
-    return Math.abs(rank) === Math.abs(file);
+  canMoveTo(position: Position, game: Game) {
+    const distance = this.currentPosition.distanceFrom(position);
+    if (!(Math.abs(distance.rank) === Math.abs(distance.file))) return false;
+    return this.checkDiagonal(distance, game);
   }
 }
 
 export class Queen extends Piece {
   type = "queen";
-  canMoveTo(position: Position): boolean {
-    const { rank, file } = this.currentPosition.distanceFrom(position);
-    return Math.abs(rank) === Math.abs(file) || rank === 0 || file === 0;
+  canMoveTo(position: Position, game: Game): boolean {
+    const distance = this.currentPosition.distanceFrom(position);
+    if (Math.abs(distance.rank) === Math.abs(distance.file)) {
+      return this.checkDiagonal(distance, game);
+    }
+    if (distance.file === 0) {
+      return this.checkFile(distance.rank, game);
+    }
+    if (distance.rank === 0) {
+      return this.checkRank(distance.file, game);
+    }
+    return false;
   }
 }
 

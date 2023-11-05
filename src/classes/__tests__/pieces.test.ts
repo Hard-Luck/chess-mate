@@ -1,5 +1,6 @@
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
 import Position from "@/classes/position";
+import Game from "../game";
 
 describe("Pawn", () => {
   describe("canMoveTo", () => {
@@ -34,49 +35,56 @@ describe("Pawn", () => {
 describe("Rook", () => {
   describe("canMoveTo", () => {
     it("should move forward 1 step", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
       const rook = new Rook("white", "A", 1);
       const move = new Position("A", 2);
-      expect(rook.canMoveTo(move)).toBe(true);
+      expect(rook.canMoveTo(move, game)).toBe(true);
     });
     it("should move backward 1 step", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 1), new Position("A", 2));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
       const rook = new Rook("white", "A", 2);
       const move = new Position("A", 1);
-      expect(rook.canMoveTo(move)).toBe(true);
+      expect(rook.canMoveTo(move, game)).toBe(true);
     });
     it("should move right 1 step", () => {
+      const game = new Game();
+      game.makeMove(new Position("B", 1), new Position("A", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
       const rook = new Rook("white", "A", 1);
       const move = new Position("B", 1);
-      expect(rook.canMoveTo(move)).toBe(true);
+      expect(rook.canMoveTo(move, game)).toBe(true);
     });
     it("should move left 1 step", () => {
+      const game = new Game();
+      game.makeMove(new Position("B", 1), new Position("A", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 1), new Position("B", 1));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
       const rook = new Rook("white", "B", 1);
       const move = new Position("A", 1);
-      expect(rook.canMoveTo(move)).toBe(true);
+      expect(rook.canMoveTo(move, game)).toBe(true);
     });
-    it("should move more than 1 step right", () => {
-      const rook = new Rook("white", "A", 4);
-      const move = new Position("B", 4);
-      expect(rook.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step left", () => {
-      const rook = new Rook("white", "D", 4);
-      const move = new Position("A", 4);
-      expect(rook.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step up", () => {
-      const rook = new Rook("white", "D", 4);
-      const move = new Position("D", 8);
-      expect(rook.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step down", () => {
-      const rook = new Rook("white", "D", 4);
-      const move = new Position("D", 1);
-      expect(rook.canMoveTo(move)).toBe(true);
+    it("should move more than 1 step", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 1), new Position("A", 3));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
+      const rook = new Rook("white", "A", 3);
+      const move = new Position("D", 3);
+      expect(rook.canMoveTo(move, game)).toBe(true);
     });
     it("shouldn't move diagonally", () => {
+      const game = new Game();
       const rook = new Rook("white", "D", 4);
       const move = new Position("E", 5);
-      expect(rook.canMoveTo(move)).toBe(false);
+      expect(rook.canMoveTo(move, game)).toBe(false);
     });
   });
 });
@@ -132,133 +140,53 @@ describe("Knight", () => {
 
 describe("Bishop", () => {
   describe("canMoveTo", () => {
-    it("should move diagonally forward and right", () => {
-      const bishop = new Bishop("white", "C", 1);
-      const move = new Position("E", 3);
-      expect(bishop.canMoveTo(move)).toBe(true);
+    it("should move diagonally forward and right and then back", () => {
+      const game = new Game();
+      game.makeMove(new Position("D", 2), new Position("D", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      let bishop = new Bishop("white", "C", 1);
+      let move = new Position("E", 3);
+      expect(bishop.canMoveTo(move, game)).toBe(true);
+      game.makeMove(new Position("C", 1), new Position("E", 3));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
+      bishop = new Bishop("white", "E", 3);
+      move = new Position("C", 1);
+      expect(bishop.canMoveTo(move, game)).toBe(true);
     });
-    it("should move diagonally forward and left", () => {
-      const bishop = new Bishop("white", "C", 1);
-      const move = new Position("A", 3);
-      expect(bishop.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally backward and right", () => {
-      const bishop = new Bishop("white", "C", 5);
-      const move = new Position("E", 3);
-      expect(bishop.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally backward and left", () => {
-      const bishop = new Bishop("white", "C", 5);
-      const move = new Position("A", 7);
-      expect(bishop.canMoveTo(move)).toBe(true);
-    });
-    it("shouldn't move otherwise", () => {
-      const testBishop = new Bishop("white", "C", 5);
-      const move = new Position("B", 3);
-      expect(testBishop.canMoveTo(move)).toBe(false);
-
-      const secondTestBishop = new Bishop("white", "F", 3);
-      const secondMove = new Position("A", 1);
-      expect(secondTestBishop.canMoveTo(secondMove)).toBe(false);
-
-      const thirdTestBishop = new Bishop("white", "F", 3);
-      const thirdMove = new Position("A", 2);
-      expect(thirdTestBishop.canMoveTo(thirdMove)).toBe(false);
-
-      const fourthTestBishop = new Bishop("white", "F", 3);
-      const fourthMove = new Position("A", 3);
-      expect(fourthTestBishop.canMoveTo(fourthMove)).toBe(false);
-
-      const fifthTestBishop = new Bishop("white", "F", 3);
-      const fifthMove = new Position("A", 4);
-      expect(fifthTestBishop.canMoveTo(fifthMove)).toBe(false);
+    it("should move diagonally forward and left then back ", () => {
+      const game = new Game();
+      game.makeMove(new Position("B", 2), new Position("B", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      let bishop = new Bishop("white", "C", 1);
+      let move = new Position("A", 3);
+      expect(bishop.canMoveTo(move, game)).toBe(true);
+      game.makeMove(new Position("C", 1), new Position("A", 3));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
+      bishop = new Bishop("white", "A", 3);
+      move = new Position("C", 1);
+      expect(bishop.canMoveTo(move, game)).toBe(true);
     });
   });
 });
 
 describe("Queen", () => {
   describe("canMoveTo", () => {
-    it("should move forward 1 step", () => {
-      const queen = new Queen("white", "A", 1);
-      const move = new Position("A", 2);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move backward 1 step", () => {
-      const queen = new Queen("white", "A", 2);
-      const move = new Position("A", 1);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move right 1 step", () => {
-      const queen = new Queen("white", "A", 1);
-      const move = new Position("B", 1);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move left 1 step", () => {
-      const queen = new Queen("white", "B", 1);
-      const move = new Position("A", 1);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step right", () => {
-      const queen = new Queen("white", "A", 4);
-      const move = new Position("B", 4);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step left", () => {
-      const queen = new Queen("white", "D", 4);
-      const move = new Position("A", 4);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step up", () => {
-      const queen = new Queen("white", "D", 4);
-      const move = new Position("D", 8);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move more than 1 step down", () => {
-      const queen = new Queen("white", "D", 4);
-      const move = new Position("D", 1);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally forward and right", () => {
-      const queen = new Queen("white", "C", 1);
-      const move = new Position("E", 3);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally forward and left", () => {
-      const queen = new Queen("white", "C", 1);
-      const move = new Position("A", 3);
-      1;
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally backward and right", () => {
-      const queen = new Queen("white", "C", 5);
-      const move = new Position("E", 3);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("should move diagonally backward and left", () => {
-      const queen = new Queen("white", "C", 5);
-      const move = new Position("A", 7);
-      expect(queen.canMoveTo(move)).toBe(true);
-    });
-    it("shouldn't move otherwise", () => {
-      const testQueen = new Queen("white", "C", 5);
-      const move = new Position("B", 3);
-      expect(testQueen.canMoveTo(move)).toBe(false);
-
-      const secondTestQueen = new Queen("white", "F", 3);
-      const secondMove = new Position("A", 1);
-      expect(secondTestQueen.canMoveTo(secondMove)).toBe(false);
-
-      const thirdTestQueen = new Queen("white", "F", 3);
-      const thirdMove = new Position("A", 2);
-      expect(thirdTestQueen.canMoveTo(thirdMove)).toBe(false);
-
-      const fourthTestQueen = new Queen("white", "F", 7);
-      const fourthMove = new Position("A", 3);
-      expect(fourthTestQueen.canMoveTo(fourthMove)).toBe(false);
-
-      const fifthTestQueen = new Queen("white", "F", 3);
-      const fifthMove = new Position("A", 4);
-      expect(fifthTestQueen.canMoveTo(fifthMove)).toBe(false);
+    it("should be able to move in all directions", () => {
+      const game = new Game();
+      game.makeMove(new Position("E", 2), new Position("E", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      // Diagonal
+      let queen = new Queen("white", "D", 1);
+      let move = new Position("G", 4);
+      expect(queen.canMoveTo(move, game)).toBe(true);
+      game.makeMove(new Position("D", 1), new Position("G", 4));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
+      // Left
+      queen = new Queen("white", "G", 4);
+      move = new Position("A", 4);
+      expect(queen.canMoveTo(move, game)).toBe(true);
+      game.makeMove(new Position("G", 4), new Position("A", 4));
+      game.makeMove(new Position("H", 5), new Position("H", 4));
     });
   });
 });

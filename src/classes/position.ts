@@ -1,18 +1,18 @@
 export type PositionFile = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 export type PositionRank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-
+export type Distance = { file: number; rank: number };
 class Position {
   constructor(private file: PositionFile, private rank: PositionRank) {
     this.file = file;
     this.rank = rank;
   }
-  private fileToNumber(file: PositionFile) {
+  static fileToNumber(file: PositionFile) {
     return "ABCDEFGH".indexOf(file) + 1;
   }
 
-  public distanceFrom(position: Position) {
-    const currentFileAsNumber = this.fileToNumber(this.file);
-    const otherFileAsNumber = this.fileToNumber(position.file);
+  public distanceFrom(position: Position): Distance {
+    const currentFileAsNumber = Position.fileToNumber(this.file);
+    const otherFileAsNumber = Position.fileToNumber(position.file);
     const fileDistance = otherFileAsNumber - currentFileAsNumber;
     const rankDistance = position.rank - this.rank;
     return { file: fileDistance, rank: rankDistance };

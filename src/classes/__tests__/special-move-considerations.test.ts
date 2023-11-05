@@ -65,4 +65,11 @@ describe("Capturing", () => {
       ).toThrow();
     });
   });
+  describe("Rook ", () => {
+    test("shouldn't be able to move through pieces", () => {
+      const game = new Game();
+      const whiteRook = game.getPieceFromPosition(new Position("A", 1));
+      expect(whiteRook?.canMoveTo(new Position("A", 3), game)).toBe(false);
+    });
+  });
 });
