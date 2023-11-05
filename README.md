@@ -10,6 +10,8 @@ Still to do:
 - Available moves list
 - Square Highlighting
 - Win conditions (checkmate/stalemate)
+- Notation Class
+- Previous moves list
 - export games
 - read PNGs
 
