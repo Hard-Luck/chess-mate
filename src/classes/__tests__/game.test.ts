@@ -81,12 +81,12 @@ describe("Game", () => {
   test("update last move after a move is taken", () => {
     const game = new Game();
     game.makeMove(new Position("A", 2), new Position("A", 4));
-    expect(game.previousMove).toEqual([
+    expect(game.moves.previousMove).toEqual([
       new Position("A", 2),
       new Position("A", 4),
     ]);
     game.makeMove(new Position("A", 7), new Position("A", 5));
-    expect(game.previousMove).toEqual([
+    expect(game.moves.previousMove).toEqual([
       new Position("A", 7),
       new Position("A", 5),
     ]);
