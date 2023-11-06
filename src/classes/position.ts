@@ -9,7 +9,10 @@ class Position {
   static fileToNumber(file: PositionFile) {
     return "ABCDEFGH".indexOf(file) + 1;
   }
-
+  static numberToFile(number: number) {
+    if (number < 1 || number > 8) throw new Error("bad number");
+    return "ABCDEFGH"[number - 1];
+  }
   public distanceFrom(position: Position): Distance {
     const currentFileAsNumber = Position.fileToNumber(this.file);
     const otherFileAsNumber = Position.fileToNumber(position.file);

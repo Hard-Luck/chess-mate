@@ -30,6 +30,30 @@ describe("Pawn", () => {
       expect(pawn.canMoveTo(move)).toBe(false);
     });
   });
+  describe("availableMoves", () => {
+    it("should return available moves for unmoved pawn", () => {
+      const game = new Game();
+      const pawn = new Pawn("white", "A", 2);
+      const moves = pawn.availableMoves(game);
+      const expectedMoves = [new Position("A", 3), new Position("A", 4)];
+      expect(moves.length).toBe(2);
+      expectedMoves.forEach((move) => {
+        expect(moves).toContainEqual(move);
+      });
+    });
+    it("should return available moves when a pawn can capture", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("B", 7), new Position("B", 5));
+      const pawn = new Pawn("white", "A", 4);
+      const moves = pawn.availableMoves(game);
+      const expectedMoves = [new Position("A", 5), new Position("B", 5)];
+      expect(moves.length).toBe(2);
+      expectedMoves.forEach((move) => {
+        expect(moves).toContainEqual(move);
+      });
+    });
+  });
 });
 
 describe("Rook", () => {

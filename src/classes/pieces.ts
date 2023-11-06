@@ -36,6 +36,8 @@ abstract class Piece {
   }
 
   abstract canMoveTo(position: Position, game?: Game): boolean;
+  abstract availableMoves(game: Game): Position[];
+
   private getFileAsIndex(file: PositionFile) {
     const files = "ABCDEFGH";
     const fileAsNum = files.indexOf(file);
@@ -131,6 +133,45 @@ export class Pawn extends Piece {
     }
     return rank === forward && file === 0;
   }
+  availableMoves(game: Game): Position[] {
+    const moves: Position[] = [];
+    const { currentFile, currentRank } = this.currentPosition;
+    const startingRank = this.pieceColor === "white" ? 2 : 7;
+    const rankAhead = (this.currentPosition.currentRank + 1) as PositionRank;
+    if (this.currentPosition.currentRank === startingRank) {
+      for (let i = 1; i < 3; i++) {
+        const move = new Position(
+          currentFile,
+          (currentRank + i) as PositionRank
+        );
+        if (this.canMoveTo(move, game)) {
+          moves.push(move);
+        }
+      }
+    } else {
+      const move = new Position(currentFile, rankAhead);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    const currentFileAsIndex = Position.fileToNumber(currentFile);
+    const leftFile = currentFileAsIndex - 1;
+    const rightFile = currentFileAsIndex + 1;
+    if (leftFile >= 1) {
+      const leftFilePosition = Position.from(
+        Position.numberToFile(leftFile),
+        currentRank + 1
+      );
+      if (this.canMoveTo(leftFilePosition, game)) moves.push(leftFilePosition);
+    }
+    if (rightFile < 8) {
+      const rightFilePosition = Position.from(
+        Position.numberToFile(rightFile),
+        currentRank + 1
+      );
+      if (this.canMoveTo(rightFilePosition, game))
+        moves.push(rightFilePosition);
+    }
+    return moves;
+  }
 }
 
 export class Rook extends Piece {
@@ -146,6 +187,10 @@ export class Rook extends Piece {
     }
     return false;
   }
+  availableMoves(game: Game): Position[] {
+    if (game) return [] as Position[];
+    return [] as Position[];
+  }
 }
 
 export class Knight extends Piece {
@@ -159,6 +204,10 @@ export class Knight extends Piece {
       (absoluteFile === 1 && absoluteRank === 2)
     );
   }
+  availableMoves(game: Game): Position[] {
+    if (game) return [] as Position[];
+    return [] as Position[];
+  }
 }
 
 export class Bishop extends Piece {
@@ -167,6 +216,10 @@ export class Bishop extends Piece {
     const distance = this.currentPosition.distanceFrom(position);
     if (!(Math.abs(distance.rank) === Math.abs(distance.file))) return false;
     return this.checkDiagonal(distance, game);
+  }
+  availableMoves(game: Game): Position[] {
+    if (game) return [] as Position[];
+    return [] as Position[];
   }
 }
 
@@ -185,6 +238,10 @@ export class Queen extends Piece {
     }
     return false;
   }
+  availableMoves(game: Game): Position[] {
+    if (game) return [] as Position[];
+    return [] as Position[];
+  }
 }
 
 export class King extends Piece {
@@ -192,5 +249,9 @@ export class King extends Piece {
   canMoveTo(position: Position): boolean {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;
+  }
+  availableMoves(game: Game): Position[] {
+    if (game) return [] as Position[];
+    return [] as Position[];
   }
 }
