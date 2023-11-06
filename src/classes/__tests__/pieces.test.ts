@@ -31,11 +31,22 @@ describe("Pawn", () => {
     });
   });
   describe("availableMoves", () => {
-    it("should return available moves for unmoved pawn", () => {
+    it("should return available moves for unmoved white pawn", () => {
       const game = new Game();
       const pawn = new Pawn("white", "A", 2);
       const moves = pawn.availableMoves(game);
       const expectedMoves = [new Position("A", 3), new Position("A", 4)];
+      expect(moves.length).toBe(2);
+      expectedMoves.forEach((move) => {
+        expect(moves).toContainEqual(move);
+      });
+    });
+    it("should return available moves for a black pawn ", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      const pawn = new Pawn("black", "A", 7);
+      const moves = pawn.availableMoves(game);
+      const expectedMoves = [new Position("A", 6), new Position("A", 5)];
       expect(moves.length).toBe(2);
       expectedMoves.forEach((move) => {
         expect(moves).toContainEqual(move);
@@ -152,48 +163,68 @@ describe("Rook", () => {
 describe("Knight", () => {
   describe("canMoveTo", () => {
     it("should move 2 steps up and 1 step right", () => {
+      const game = new Game();
       const knight = new Knight("white", "B", 1);
       const move = new Position("C", 3);
-      expect(knight.canMoveTo(move)).toBe(true);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("should move 2 steps up and 1 step left", () => {
+      const game = new Game();
       const knight = new Knight("white", "B", 1);
       const move = new Position("A", 3);
-      expect(knight.canMoveTo(move)).toBe(true);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("should move 2 steps down and 1 step right", () => {
-      const knight = new Knight("white", "C", 3);
-      const move = new Position("D", 1);
-      expect(knight.canMoveTo(move)).toBe(true);
+      const game = new Game();
+      game.makeMove(new Position("B", 1), new Position("A", 3));
+      game.makeMove(new Position("B", 7), new Position("B", 6));
+      const knight = new Knight("white", "A", 3);
+      const move = new Position("B", 1);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
-    it("should move 2 steps down and 1 step left", () => {
+    it("should move 2 steps down and one step left", () => {
+      const game = new Game();
+      game.makeMove(new Position("B", 1), new Position("C", 3));
+      game.makeMove(new Position("B", 7), new Position("B", 6));
       const knight = new Knight("white", "C", 3);
       const move = new Position("B", 1);
-      expect(knight.canMoveTo(move)).toBe(true);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("should move 2 steps right and 1 step up", () => {
-      const knight = new Knight("white", "C", 3);
-      const move = new Position("E", 4);
-      expect(knight.canMoveTo(move)).toBe(true);
+      const game = new Game();
+      game.makeMove(new Position("D", 2), new Position("D", 3));
+      game.makeMove(new Position("D", 7), new Position("D", 6));
+      const knight = new Knight("white", "B", 1);
+      const move = new Position("D", 2);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("should move 2 steps left and 1 step up", () => {
-      const knight = new Knight("white", "C", 3);
-      const move = new Position("A", 4);
-      expect(knight.canMoveTo(move)).toBe(true);
+      const game = new Game();
+      game.makeMove(new Position("E", 2), new Position("E", 3));
+      game.makeMove(new Position("E", 7), new Position("E", 6));
+      const knight = new Knight("white", "G", 1);
+      const move = new Position("E", 2);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("should move 2 steps left and 1 step down", () => {
-      const knight = new Knight("white", "C", 3);
-      const move = new Position("A", 2);
-      expect(knight.canMoveTo(move)).toBe(true);
+      const game = new Game();
+      game.makeMove(new Position("D", 2), new Position("D", 3));
+      game.makeMove(new Position("D", 7), new Position("D", 6));
+      game.makeMove(new Position("B", 1), new Position("D", 2));
+      game.makeMove(new Position("D", 6), new Position("D", 5));
+      const knight = new Knight("white", "D", 2);
+      const move = new Position("B", 1);
+      expect(knight.canMoveTo(move, game)).toBe(true);
     });
     it("shouldn't move otherwise", () => {
+      const game = new Game();
       const knight = new Knight("white", "C", 3);
       const move = new Position("B", 2);
-      expect(knight.canMoveTo(move)).toBe(false);
+      expect(knight.canMoveTo(move, game)).toBe(false);
 
       const secondTestKnight = new Knight("white", "F", 3);
       const secondMove = new Position("A", 1);
-      expect(secondTestKnight.canMoveTo(secondMove)).toBe(false);
+      expect(secondTestKnight.canMoveTo(secondMove, game)).toBe(false);
     });
   });
 });
@@ -227,6 +258,32 @@ describe("Bishop", () => {
       expect(bishop.canMoveTo(move, game)).toBe(true);
     });
   });
+  describe("availableMoves", () => {
+    it("should return available moves", () => {
+      const game = new Game();
+      game.makeMove(new Position("D", 2), new Position("D", 3));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("C", 1), new Position("E", 3));
+      game.makeMove(new Position("H", 6), new Position("H", 5));
+      const bishop = new Bishop("white", "E", 3);
+      const moves = bishop.availableMoves(game);
+      const expectedMoves = [
+        new Position("C", 1),
+        new Position("D", 2),
+        new Position("F", 4),
+        new Position("G", 5),
+        new Position("H", 6),
+        new Position("D", 4),
+        new Position("C", 5),
+        new Position("B", 6),
+        new Position("A", 7),
+      ];
+      expect(moves.length).toBe(9);
+      moves.forEach((move) => {
+        expect(expectedMoves).toContainEqual(move);
+      });
+    });
+  });
 });
 
 describe("Queen", () => {
@@ -249,60 +306,101 @@ describe("Queen", () => {
       game.makeMove(new Position("H", 5), new Position("H", 4));
     });
   });
+  describe("availableMoves", () => {
+    const game = new Game();
+    game.makeMove(new Position("E", 2), new Position("E", 3));
+    game.makeMove(new Position("A", 7), new Position("A", 6));
+    game.makeMove(new Position("D", 1), new Position("G", 4));
+    game.makeMove(new Position("G", 7), new Position("G", 6));
+    const moves = new Queen("white", "G", 4).availableMoves(game);
+    const expectedMoves = [
+      { file: "A", rank: 4 },
+      { file: "B", rank: 4 },
+      { file: "C", rank: 4 },
+      { file: "D", rank: 1 },
+      { file: "D", rank: 4 },
+      { file: "D", rank: 7 },
+      { file: "E", rank: 2 },
+      { file: "E", rank: 4 },
+      { file: "E", rank: 6 },
+      { file: "F", rank: 3 },
+      { file: "F", rank: 4 },
+      { file: "F", rank: 5 },
+      { file: "G", rank: 3 },
+      { file: "G", rank: 5 },
+      { file: "G", rank: 6 },
+      { file: "H", rank: 3 },
+      { file: "H", rank: 4 },
+      { file: "H", rank: 5 },
+    ];
+    expect(moves.length).toBe(expectedMoves.length);
+    moves.forEach((move) => {
+      expect(expectedMoves).toContainEqual(move);
+    });
+  });
 });
 
 describe("King", () => {
   it("should move 1 step forward", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("E", 5);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step backward", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("E", 3);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step right", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("F", 4);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step left", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("D", 4);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step  diagonally up-right ", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("F", 5);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step diagonally up-left", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("D", 5);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step diagonally down-right", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("F", 3);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("should move 1 step diagonally down-left", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("D", 3);
-    expect(king.canMoveTo(move)).toBe(true);
+    expect(king.canMoveTo(move, game)).toBe(true);
   });
   it("shouldn't move otherwise", () => {
+    const game = new Game();
     const king = new King("white", "E", 4);
     const move = new Position("E", 6);
-    expect(king.canMoveTo(move)).toBe(false);
+    expect(king.canMoveTo(move, game)).toBe(false);
 
     const secondKing = new King("white", "E", 4);
     const secondMove = new Position("G", 4);
-    expect(secondKing.canMoveTo(secondMove)).toBe(false);
+    expect(secondKing.canMoveTo(secondMove, game)).toBe(false);
 
     const thirdKing = new King("white", "E", 4);
     const thirdMove = new Position("C", 3);
-    expect(thirdKing.canMoveTo(thirdMove)).toBe(false);
+    expect(thirdKing.canMoveTo(thirdMove, game)).toBe(false);
   });
 });

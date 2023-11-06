@@ -93,6 +93,53 @@ abstract class Piece {
     }
     return true;
   }
+  availableStraightMoves(game: Game) {
+    const { currentFile, currentRank } = this.currentPosition;
+    const moves: Position[] = [];
+    for (let i = 1; i < currentRank; i++) {
+      const move = new Position(currentFile, i as PositionRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    for (let i = currentRank + 1; i < 9; i++) {
+      const move = new Position(currentFile, i as PositionRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    const currentFileIndex = Position.fileToNumber(currentFile);
+    for (let i = 1; i < currentFileIndex; i++) {
+      const move = new Position(Position.numberToFile(i), currentRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    for (let i = currentFileIndex + 1; i < 9; i++) {
+      const move = new Position(Position.numberToFile(i), currentRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    return moves;
+  }
+  availableDiagonals(game: Game): Position[] {
+    const { currentFile, currentRank } = this.currentPosition;
+    const fileAsNum = Position.fileToNumber(currentFile);
+    const moves: Position[] = [];
+    const directions: [number, number][] = [
+      [-1, -1],
+      [-1, 1],
+      [1, -1],
+      [1, 1],
+    ];
+    directions.forEach(([fileOffset, rankOffset]) => {
+      for (let i = 1; i <= 8; i++) {
+        const newFileAsNum = fileAsNum + fileOffset * i;
+        const newRank = (currentRank + rankOffset * i) as PositionRank;
+        const fileInBounds = newFileAsNum >= 1 && newFileAsNum <= 8;
+        const rankInBounds = newRank >= 1 && newRank <= 8;
+        if (fileInBounds && rankInBounds) {
+          const file = Position.numberToFile(newFileAsNum);
+          const newPosition = new Position(file, newRank);
+          if (this.canMoveTo(newPosition, game)) moves.push(newPosition);
+        } else break;
+      }
+    });
+    return moves;
+  }
   moveTo(newPosition: Position, game?: Game) {
     if (this.canMoveTo(newPosition, game)) {
       this.position = newPosition;
@@ -136,13 +183,16 @@ export class Pawn extends Piece {
   availableMoves(game: Game): Position[] {
     const moves: Position[] = [];
     const { currentFile, currentRank } = this.currentPosition;
-    const startingRank = this.pieceColor === "white" ? 2 : 7;
-    const rankAhead = (this.currentPosition.currentRank + 1) as PositionRank;
+    const isWhitePiece = this.pieceColor === "white";
+    const direction = isWhitePiece ? 1 : -1;
+    const startingRank = isWhitePiece ? 2 : 7;
+    const rankAhead = (this.currentPosition.currentRank +
+      1 * direction) as PositionRank;
     if (this.currentPosition.currentRank === startingRank) {
       for (let i = 1; i < 3; i++) {
         const move = new Position(
           currentFile,
-          (currentRank + i) as PositionRank
+          (currentRank + i * direction) as PositionRank
         );
         if (this.canMoveTo(move, game)) {
           moves.push(move);
@@ -158,14 +208,14 @@ export class Pawn extends Piece {
     if (leftFile >= 1) {
       const leftFilePosition = Position.from(
         Position.numberToFile(leftFile),
-        currentRank + 1
+        currentRank + 1 * direction
       );
       if (this.canMoveTo(leftFilePosition, game)) moves.push(leftFilePosition);
     }
     if (rightFile < 8) {
       const rightFilePosition = Position.from(
         Position.numberToFile(rightFile),
-        currentRank + 1
+        currentRank + 1 * direction
       );
       if (this.canMoveTo(rightFilePosition, game))
         moves.push(rightFilePosition);
@@ -190,32 +240,15 @@ export class Rook extends Piece {
     return false;
   }
   availableMoves(game: Game): Position[] {
-    const moves: Position[] = [];
-    const { currentFile, currentRank } = this.currentPosition;
-    for (let i = 1; i < currentRank; i++) {
-      const move = new Position(currentFile, i as PositionRank);
-      if (this.canMoveTo(move, game)) moves.push(move);
-    }
-    for (let i = currentRank + 1; i < 9; i++) {
-      const move = new Position(currentFile, i as PositionRank);
-      if (this.canMoveTo(move, game)) moves.push(move);
-    }
-    const currentFileIndex = Position.fileToNumber(currentFile);
-    for (let i = 1; i < currentFileIndex; i++) {
-      const move = new Position(Position.numberToFile(i), currentRank);
-      if (this.canMoveTo(move, game)) moves.push(move);
-    }
-    for (let i = currentFileIndex + 1; i < 9; i++) {
-      const move = new Position(Position.numberToFile(i), currentRank);
-      if (this.canMoveTo(move, game)) moves.push(move);
-    }
-    return moves;
+    return this.availableStraightMoves(game);
   }
 }
 
 export class Knight extends Piece {
   type = "knight";
-  canMoveTo(position: Position) {
+  canMoveTo(position: Position, game: Game) {
+    const pieceCheck = game.getPieceFromPosition(position);
+    if (pieceCheck?.pieceColor === this.pieceColor) return false;
     const { rank, file } = this.currentPosition.distanceFrom(position);
     const absoluteRank = Math.abs(rank);
     const absoluteFile = Math.abs(file);
@@ -225,27 +258,57 @@ export class Knight extends Piece {
     );
   }
   availableMoves(game: Game): Position[] {
-    if (game) return [] as Position[];
-    return [] as Position[];
+    const moves = [] as Position[];
+    const knightMoves = [
+      [-2, -1],
+      [-1, -2],
+      [2, -1],
+      [1, -2],
+      [-2, 1],
+      [-1, 2],
+      [2, 1],
+      [1, 2],
+    ];
+    for (const move of knightMoves) {
+      const { currentFile, currentRank: rank } = this.currentPosition;
+      const fileAsNum = Position.fileToNumber(currentFile);
+      const fileToCheck = fileAsNum + move[0];
+      const rankToCheck = (rank + move[1]) as PositionRank;
+      if (
+        fileToCheck > 8 ||
+        fileToCheck < 1 ||
+        rankToCheck < 1 ||
+        rankToCheck > 8
+      ) {
+        continue;
+      }
+      const file = Position.numberToFile(fileToCheck);
+      const position = new Position(file, rankToCheck);
+      if (this.canMoveTo(position, game)) moves.push(position);
+    }
+    return moves;
   }
 }
 
 export class Bishop extends Piece {
   type = "bishop";
   canMoveTo(position: Position, game: Game) {
+    const pieceCheck = game.getPieceFromPosition(position);
+    if (pieceCheck?.pieceColor === this.pieceColor) return false;
     const distance = this.currentPosition.distanceFrom(position);
     if (!(Math.abs(distance.rank) === Math.abs(distance.file))) return false;
     return this.checkDiagonal(distance, game);
   }
   availableMoves(game: Game): Position[] {
-    if (game) return [] as Position[];
-    return [] as Position[];
+    return this.availableDiagonals(game);
   }
 }
 
 export class Queen extends Piece {
   type = "queen";
   canMoveTo(position: Position, game: Game): boolean {
+    const pieceCheck = game.getPieceFromPosition(position);
+    if (pieceCheck?.pieceColor === this.pieceColor) return false;
     const distance = this.currentPosition.distanceFrom(position);
     if (Math.abs(distance.rank) === Math.abs(distance.file)) {
       return this.checkDiagonal(distance, game);
@@ -259,19 +322,38 @@ export class Queen extends Piece {
     return false;
   }
   availableMoves(game: Game): Position[] {
-    if (game) return [] as Position[];
-    return [] as Position[];
+    const diagonalMoves = this.availableDiagonals(game);
+    const straightMoves = this.availableStraightMoves(game);
+    const moves = [...diagonalMoves, ...straightMoves];
+    return moves;
   }
 }
 
 export class King extends Piece {
   type = "king";
-  canMoveTo(position: Position): boolean {
+  canMoveTo(position: Position, game: Game): boolean {
+    const pieceCheck = game.getPieceFromPosition(position);
+    if (pieceCheck?.pieceColor === this.pieceColor) return false;
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;
   }
   availableMoves(game: Game): Position[] {
-    if (game) return [] as Position[];
-    return [] as Position[];
+    const moves: Position[] = [];
+    const { currentRank, currentFile } = this.currentPosition;
+    const fileAsNum = Position.fileToNumber(currentFile);
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (i === 0 && j === 0) continue;
+        const rank = (currentRank + j) as PositionRank;
+        const newFileAsNum = fileAsNum + i;
+        if (newFileAsNum < 1 || newFileAsNum > 8 || rank < 1 || rank > 8)
+          continue;
+        const file = Position.numberToFile(newFileAsNum);
+        if (this.canMoveTo(new Position(file, rank), game))
+          moves.push(new Position(file, rank));
+      }
+    }
+    console.log(moves);
+    return moves;
   }
 }
