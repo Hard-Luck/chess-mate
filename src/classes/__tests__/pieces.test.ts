@@ -111,6 +111,42 @@ describe("Rook", () => {
       expect(rook.canMoveTo(move, game)).toBe(false);
     });
   });
+  describe("availableMoves", () => {
+    it("should return available moves for rook", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 4), new Position("A", 5));
+      game.makeMove(new Position("G", 7), new Position("G", 6));
+      game.makeMove(new Position("A", 1), new Position("A", 4));
+      game.makeMove(new Position("F", 7), new Position("F", 6));
+      game.makeMove(new Position("A", 4), new Position("D", 4));
+      game.makeMove(new Position("A", 7), new Position("A", 6));
+      const rook = new Rook("white", "D", 4);
+      const moves = rook.availableMoves(game);
+      const expectedMoves = [
+        new Position("D", 3),
+        new Position("D", 5),
+        new Position("D", 6),
+        new Position("D", 7),
+        new Position("A", 4),
+        new Position("B", 4),
+        new Position("C", 4),
+        new Position("E", 4),
+        new Position("F", 4),
+        new Position("G", 4),
+        new Position("H", 4),
+      ];
+      expect(moves.length).toBe(11);
+      expectedMoves.forEach((move) => {
+        expect(moves).toContainEqual(move);
+      });
+    });
+  });
+  it("should return available moves when a rook can capture", () => {
+    const game = new Game();
+    game.makeMove(new Position("A", 2), new Position("A", 4));
+  });
 });
 
 describe("Knight", () => {

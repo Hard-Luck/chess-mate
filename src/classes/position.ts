@@ -11,7 +11,7 @@ class Position {
   }
   static numberToFile(number: number) {
     if (number < 1 || number > 8) throw new Error("bad number");
-    return "ABCDEFGH"[number - 1];
+    return "ABCDEFGH"[number - 1] as PositionFile;
   }
   public distanceFrom(position: Position): Distance {
     const currentFileAsNumber = Position.fileToNumber(this.file);

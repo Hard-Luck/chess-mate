@@ -177,6 +177,8 @@ export class Pawn extends Piece {
 export class Rook extends Piece {
   type = "rook";
   canMoveTo(position: Position, game: Game) {
+    if (game.getPieceFromPosition(position)?.pieceColor === this.pieceColor)
+      return false;
     const { rank, file } = this.currentPosition.distanceFrom(position);
     if (file === 0) {
       const check = this.checkFile(rank, game);
@@ -188,8 +190,26 @@ export class Rook extends Piece {
     return false;
   }
   availableMoves(game: Game): Position[] {
-    if (game) return [] as Position[];
-    return [] as Position[];
+    const moves: Position[] = [];
+    const { currentFile, currentRank } = this.currentPosition;
+    for (let i = 1; i < currentRank; i++) {
+      const move = new Position(currentFile, i as PositionRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    for (let i = currentRank + 1; i < 9; i++) {
+      const move = new Position(currentFile, i as PositionRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    const currentFileIndex = Position.fileToNumber(currentFile);
+    for (let i = 1; i < currentFileIndex; i++) {
+      const move = new Position(Position.numberToFile(i), currentRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    for (let i = currentFileIndex + 1; i < 9; i++) {
+      const move = new Position(Position.numberToFile(i), currentRank);
+      if (this.canMoveTo(move, game)) moves.push(move);
+    }
+    return moves;
   }
 }
 
