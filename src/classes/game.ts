@@ -1,4 +1,4 @@
-import ChessBoard from "./chessBoard";
+import ChessBoard from "./chessboard";
 import Moves from "./moves";
 import { King, Knight, Bishop, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionFile, PositionRank } from "./position";
@@ -31,7 +31,29 @@ export default class Game {
   get turnColor() {
     return this.playerTurn;
   }
-
+  private kingLocation(color: "white" | "black") {
+    const king = this.chessBoard.state
+      .flat()
+      .find((piece) => piece?.type === "king" && piece?.pieceColor === color);
+    if (!king) throw new Error("king not found");
+    return king.currentPosition;
+  }
+  private inCheck(kingLocation: Position) {
+    const king = this.getPieceFromPosition(kingLocation);
+    const { currentRank: rank, currentFile: file } = kingLocation;
+    for (const piece of this.chessBoard.state.flat()) {
+      if (piece?.pieceColor !== king?.pieceColor) {
+        const availableMoves = piece?.availableMoves(this);
+        if (!availableMoves) continue;
+        for (const move of availableMoves) {
+          if (move.currentRank === rank && move.currentFile === file) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
   public getPieceFromPosition(position: Position) {
     const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
     return this.chessBoard.state[position.currentRank - 1][fileAsNumber];
@@ -60,6 +82,11 @@ export default class Game {
         this.playerTurn = this.playerTurn === "black" ? "white" : "black";
         if (this.playerTurn === "white") ++this.turn;
         this.moves.addMove([startPosition, enPassantPosition]);
+        const opponentsKingLocation = this.kingLocation(this.playerTurn);
+        if (this.inCheck(opponentsKingLocation)) {
+          const king = this.getPieceFromPosition(opponentsKingLocation) as King;
+          king.checked = true;
+        }
         return [...this.chessBoard.state];
       }
     }
@@ -74,6 +101,11 @@ export default class Game {
     this.playerTurn = this.playerTurn === "black" ? "white" : "black";
     if (this.playerTurn === "white") ++this.turn;
     this.moves.addMove([startPosition, endPosition]);
+    const opponentsKingLocation = this.kingLocation(this.playerTurn);
+    if (this.inCheck(opponentsKingLocation)) {
+      const king = this.getPieceFromPosition(opponentsKingLocation) as King;
+      king.checked = true;
+    }
     return [...this.chessBoard.state];
   }
 }

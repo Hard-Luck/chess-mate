@@ -355,12 +355,14 @@ export class Queen extends Piece {
 
 export class King extends Piece {
   type = "king";
+  checked = false;
   canMoveTo(position: Position, game: Game): boolean {
     const pieceCheck = game.getPieceFromPosition(position);
     if (pieceCheck?.pieceColor === this.pieceColor) return false;
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;
   }
+
   availableMoves(game: Game): Position[] {
     const moves: Position[] = [];
     const { currentRank, currentFile } = this.currentPosition;
