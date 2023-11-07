@@ -1,5 +1,6 @@
-import { Board } from "./game";
+import { Board, Piece } from "./game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
+import Position, { PositionFile } from "./position";
 
 export default class ChessBoard {
   private board: Board;
@@ -54,6 +55,39 @@ export default class ChessBoard {
       ],
     ];
     return board;
+  }
+  static fileFromDistance(file: PositionFile, distance: number): PositionFile {
+    const fileAsNumber = "ABCDEFGH".indexOf(file);
+    if (fileAsNumber + distance < 0 || fileAsNumber + distance > 7) {
+      throw new Error("File out of bounds");
+    }
+    const newFile = "ABCDEFGH"[fileAsNumber - distance];
+    return newFile as PositionFile;
+  }
+  public getPieceFromPosition(position: Position) {
+    const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
+    return this.board[position.currentRank - 1][fileAsNumber];
+  }
+  private setPosition(position: Position, piece: Piece) {
+    const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
+    this.board[position.currentRank - 1][fileAsNumber] = piece;
+  }
+  public movePiece(from: Position, to: Position): void {
+    const piece = this.getPieceFromPosition(from);
+    if (!piece) throw new Error("No piece found at position ");
+    this.setPosition(from, null);
+    const potentiallyCapturedPiece = this.getPieceFromPosition(to);
+    if (potentiallyCapturedPiece) {
+      potentiallyCapturedPiece.isCaptured = true;
+    }
+    this.setPosition(to, piece);
+  }
+  public kingLocation(color: "white" | "black") {
+    const king = this.state
+      .flat()
+      .find((piece) => piece?.type === "king" && piece?.pieceColor === color);
+    if (!king) throw new Error("king not found");
+    return king.currentPosition;
   }
   get state() {
     return this.board;

@@ -20,20 +20,20 @@ function useGame() {
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
     const position = Position.from(square[0], square[1]);
-    const piece = game.getPieceFromPosition(position);
+    const piece = game.getPieceAtPosition(position);
     if (selectedSquare === null) {
       if (piece?.pieceColor === game.turnColor) {
         setSelectedSquare(position);
-        const possibleMoves = piece?.availableMoves(game) || ([] as Position[]);
-        const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
-          (acc, curr) => {
-            const index = `${curr.currentFile}${curr.currentRank}` as string;
-            acc[index] = true;
-            return acc;
-          },
-          {}
-        );
-        setAvailableMoves(movesIndexes);
+        // const possibleMoves = piece?.availableMoves(game) || ([] as Position[]);
+        // const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
+        //   (acc, curr) => {
+        //     const index = `${curr.currentFile}${curr.currentRank}` as string;
+        //     acc[index] = true;
+        //     return acc;
+        //   },
+        //   {}
+        // );
+        //setAvailableMoves(movesIndexes);
       }
     } else {
       try {
@@ -42,6 +42,7 @@ function useGame() {
         setBoard(newBoard);
         setAvailableMoves({});
       } catch (err) {
+        console.log(err);
         setSelectedSquare(null);
         setAvailableMoves({});
       }
