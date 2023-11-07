@@ -150,12 +150,41 @@ abstract class Piece {
 }
 
 export class Pawn extends Piece {
+  public checkEnPassant(game: Game) {
+    const rankForEnPassant = this.pieceColor === "white" ? 5 : 4;
+    if (this.currentPosition.currentRank !== rankForEnPassant) return false;
+    const lastMove = game.moves.previousMove;
+    if (!lastMove) return false;
+    const distance = lastMove[0].distanceFrom(lastMove[1]);
+    const piece = game.getPieceFromPosition(lastMove[1]);
+    if (
+      piece?.type === "pawn" &&
+      piece?.pieceColor !== this.pieceColor &&
+      Math.abs(distance.rank) === 2
+    ) {
+      return true;
+    }
+    return false;
+  }
   type = "pawn";
   canMoveTo(position: Position, game?: Game) {
-    const startRank = this.pieceColor === "white" ? 2 : 7;
     const forward = this.pieceColor === "white" ? 1 : -1;
+    const startRank = this.pieceColor === "white" ? 2 : 7;
     const { rank, file } = this.currentPosition.distanceFrom(position);
     const attemptedCapture = Math.abs(file) === 1 && rank === forward;
+    if (
+      game &&
+      this.checkEnPassant(game) &&
+      position.currentFile !== this.currentPosition.currentFile
+    ) {
+      const lastMove = game.moves.previousMove;
+      if (!lastMove) return false;
+      const lastMoveFile = lastMove[1].currentFile;
+      const lastMoveRank = lastMove[1].currentRank;
+      if (position.currentFile !== lastMoveFile) return false;
+      if (position.currentRank - forward !== lastMoveRank) return false;
+      return true;
+    }
     if (attemptedCapture) {
       if (!game) throw Error("No board passed");
       const pieceOnCapturingSquare = game.getPieceFromPosition(position);
@@ -188,20 +217,14 @@ export class Pawn extends Piece {
     const startingRank = isWhitePiece ? 2 : 7;
     const rankAhead = (this.currentPosition.currentRank +
       1 * direction) as PositionRank;
+    const twoAhead = (this.currentPosition.currentRank +
+      2 * direction) as PositionRank;
     if (this.currentPosition.currentRank === startingRank) {
-      for (let i = 1; i < 3; i++) {
-        const move = new Position(
-          currentFile,
-          (currentRank + i * direction) as PositionRank
-        );
-        if (this.canMoveTo(move, game)) {
-          moves.push(move);
-        }
-      }
-    } else {
-      const move = new Position(currentFile, rankAhead);
+      const move = new Position(currentFile, twoAhead);
       if (this.canMoveTo(move, game)) moves.push(move);
     }
+    const move = new Position(currentFile, rankAhead);
+    if (this.canMoveTo(move, game)) moves.push(move);
     const currentFileAsIndex = Position.fileToNumber(currentFile);
     const leftFile = currentFileAsIndex - 1;
     const rightFile = currentFileAsIndex + 1;
@@ -220,6 +243,7 @@ export class Pawn extends Piece {
       if (this.canMoveTo(rightFilePosition, game))
         moves.push(rightFilePosition);
     }
+
     return moves;
   }
 }
@@ -353,7 +377,6 @@ export class King extends Piece {
           moves.push(new Position(file, rank));
       }
     }
-    console.log(moves);
     return moves;
   }
 }

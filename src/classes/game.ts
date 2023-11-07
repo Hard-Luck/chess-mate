@@ -2,6 +2,7 @@ import ChessBoard from "./chessBoard";
 import Moves from "./moves";
 import { King, Knight, Bishop, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionFile, PositionRank } from "./position";
+import { pieceIsPawn } from "./utils";
 
 export type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
 export type ShorthandPosition = [PositionFile, PositionRank];
@@ -43,6 +44,24 @@ export default class Game {
     const pieceToMove = this.getPieceFromPosition(startPosition);
     if (!pieceToMove || pieceToMove.pieceColor !== this.playerTurn) {
       throw new Error(`${!pieceToMove}`);
+    }
+    const forward = this.playerTurn === "white" ? 1 : -1;
+    if (pieceIsPawn(pieceToMove) && pieceToMove.checkEnPassant(this)) {
+      const enPassantPosition = new Position(
+        endPosition.currentFile,
+        (endPosition.currentRank - forward) as PositionRank
+      );
+      const enPassantPiece = this.getPieceFromPosition(enPassantPosition);
+      if (enPassantPiece) {
+        enPassantPiece.isCaptured = true;
+        this.setPosition(startPosition, null);
+        this.setPosition(enPassantPosition, null);
+        this.setPosition(endPosition, pieceToMove);
+        this.playerTurn = this.playerTurn === "black" ? "white" : "black";
+        if (this.playerTurn === "white") ++this.turn;
+        this.moves.addMove([startPosition, enPassantPosition]);
+        return [...this.chessBoard.state];
+      }
     }
     const endPiece = this.getPieceFromPosition(endPosition);
     pieceToMove.moveTo(endPosition, this);

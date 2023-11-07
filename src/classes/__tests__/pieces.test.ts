@@ -52,6 +52,20 @@ describe("Pawn", () => {
         expect(moves).toContainEqual(move);
       });
     });
+    it("should return available moves for en Passant", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 4), new Position("A", 5));
+      game.makeMove(new Position("B", 7), new Position("B", 5));
+      const pawn = new Pawn("white", "A", 5);
+      const expectedMoves = [new Position("B", 6), new Position("A", 6)];
+      const moves = pawn.availableMoves(game);
+      expect(moves.length).toBe(2);
+      expectedMoves.forEach((move) => {
+        expect(moves).toContainEqual(move);
+      });
+    });
     it("should return available moves when a pawn can capture", () => {
       const game = new Game();
       game.makeMove(new Position("A", 2), new Position("A", 4));
@@ -63,6 +77,31 @@ describe("Pawn", () => {
       expectedMoves.forEach((move) => {
         expect(moves).toContainEqual(move);
       });
+    });
+  });
+  describe("en Passant", () => {
+    it("white piece should be able to take en Passant", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 6));
+      game.makeMove(new Position("A", 4), new Position("A", 5));
+      game.makeMove(new Position("B", 7), new Position("B", 5));
+      const pawn = new Pawn("white", "A", 5);
+      expect(pawn.canMoveTo(new Position("B", 6), game)).toBe(true);
+      game.makeMove(new Position("A", 5), new Position("B", 6));
+      expect(game.getPieceFromPosition(new Position("B", 5))).toBeNull();
+    });
+    it("black piece should be able to take en Passant", () => {
+      const game = new Game();
+      game.makeMove(new Position("A", 2), new Position("A", 4));
+      game.makeMove(new Position("H", 7), new Position("H", 5));
+      game.makeMove(new Position("A", 4), new Position("A", 5));
+      game.makeMove(new Position("H", 5), new Position("H", 4));
+      game.makeMove(new Position("G", 2), new Position("G", 4));
+      const pawn = new Pawn("black", "H", 4);
+      expect(pawn.canMoveTo(new Position("G", 3), game)).toBe(true);
+      game.makeMove(new Position("H", 4), new Position("G", 3));
+      expect(game.getPieceFromPosition(new Position("G", 4))).toBeNull();
     });
   });
 });

@@ -13,6 +13,13 @@ class Position {
     if (number < 1 || number > 8) throw new Error("bad number");
     return "ABCDEFGH"[number - 1] as PositionFile;
   }
+  static positionFromBoardIndex(row: number, col: number) {
+    if (row < 0 || col < 0 || row > 7 || col > 7) return null;
+    return new Position(
+      Position.numberToFile(col + 1),
+      (row + 1) as PositionRank
+    );
+  }
   public distanceFrom(position: Position): Distance {
     const currentFileAsNumber = Position.fileToNumber(this.file);
     const otherFileAsNumber = Position.fileToNumber(position.file);
