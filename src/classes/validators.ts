@@ -94,6 +94,7 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
     if (!super.validateMove()) return false;
     const distance = this.from.distanceFrom(this.to);
     const { rank, file } = distance;
+    if (rank === 0 || file === 0) return false;
     const absoluteDifference = Math.abs(rank);
     const currentRank = this.from.currentRank;
     const rankDirection = rank < 0 ? -1 : 1;
@@ -114,14 +115,16 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
 export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
-    const { rank } = this.from.distanceFrom(this.to);
+    const { rank, file } = this.from.distanceFrom(this.to);
+    if (file !== 0) return false;
+    ``;
     const direction = rank > 0 ? 1 : -1;
-    const file = this.from.currentFile;
+    const currentFile = this.from.currentFile;
     const startRank = this.from.currentRank;
     for (let i = 1; i < Math.abs(rank); i += 1) {
       if (
         this.board.getPieceFromPosition(
-          Position.from(file, startRank + i * direction)
+          Position.from(currentFile, startRank + i * direction)
         )
       ) {
         return false;
@@ -134,9 +137,10 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
 export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
-    const { file } = this.from.distanceFrom(this.to);
+    const { file, rank } = this.from.distanceFrom(this.to);
+    if (rank !== 0) return false;
     const direction = file > 0 ? 1 : -1;
-    for (let i = 1; i < Math.abs(file); i += 1) {
+    for (let i = 1; i < Math.abs(file); i++) {
       const fileToCheck = ChessBoard.fileFromDistance(
         this.from.currentFile,
         i * direction

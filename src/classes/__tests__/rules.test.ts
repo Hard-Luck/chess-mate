@@ -2,6 +2,7 @@ import {
   DiagonalMoveValidator,
   HorizontalMoveValidator,
   PawnMoveValidator,
+  VerticalMoveValidator,
 } from "../validators";
 import ChessBoard from "../chessboard";
 import Position from "../position";
@@ -135,6 +136,40 @@ it("shouldn't be able to move diagonally through a piece", () => {
     );
     expect(validator.validateMove()).toBe(false);
   }
+});
+describe("VerticalMoveValidator", () => {
+  it("should validate vertical move", () => {
+    const board = new ChessBoard();
+    // remove a pawn for rook to move
+    board.setPosition(new Position("A", 2), null);
+    const moveFrom = new Position("A", 1);
+    const moveTo = new Position("A", 6);
+    const rook = board.getPieceFromPosition(moveFrom);
+    if (pieceIsRook(rook)) {
+      const validator = new VerticalMoveValidator(
+        rook,
+        moveFrom,
+        moveTo,
+        board
+      );
+      expect(validator.validateMove()).toBe(true);
+    }
+  });
+  it.only("shouldn't vertical move through a piece", () => {
+    const board = new ChessBoard();
+    const moveFrom = new Position("A", 1);
+    const moveTo = new Position("A", 6);
+    const rook = board.getPieceFromPosition(moveFrom);
+    if (pieceIsRook(rook)) {
+      const validator = new VerticalMoveValidator(
+        rook,
+        moveFrom,
+        moveTo,
+        board
+      );
+      expect(validator.validateMove()).toBe(false);
+    }
+  });
 });
 
 describe("special considerations", () => {

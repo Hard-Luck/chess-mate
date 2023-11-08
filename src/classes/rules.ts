@@ -81,6 +81,9 @@ class Rules {
         to,
         this.board
       );
+      console.log(horizontalValidator.validateMove(), "horizontal");
+      console.log(verticalValidator.validateMove(), "vertical");
+
       return (
         verticalValidator.validateMove() || horizontalValidator.validateMove()
       );
