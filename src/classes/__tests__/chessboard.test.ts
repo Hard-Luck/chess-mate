@@ -1,4 +1,4 @@
-import ChessBoard from "@/classes/chessboard";
+import ChessBoard from "../board";
 import { defaultSetUpBoard } from "./chessboards/default-setup-chessboard";
 
 describe("Chessboard", () => {

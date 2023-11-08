@@ -1,7 +1,7 @@
-import ChessBoard from "./chessboard";
 import Rules from "./rules";
 import { King, Knight, Bishop, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionFile, PositionRank } from "./position";
+import ChessBoard from "./board";
 
 export type Piece = King | Queen | Rook | Bishop | Knight | Pawn | null;
 export type ShorthandPosition = [PositionFile, PositionRank];

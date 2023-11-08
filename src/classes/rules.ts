@@ -1,4 +1,4 @@
-import ChessBoard from "./chessboard";
+import ChessBoard from "./board";
 import Moves from "./moves";
 import Position from "./position";
 import {

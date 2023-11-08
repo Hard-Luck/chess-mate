@@ -4,11 +4,12 @@ import {
   PawnMoveValidator,
   VerticalMoveValidator,
 } from "../validators";
-import ChessBoard from "../chessboard";
 import Position from "../position";
 import { pieceIsBishop, pieceIsPawn, pieceIsRook } from "../utils";
 import { Pawn } from "../pieces";
 import { Move } from "../game";
+import ChessBoard from "../board";
+
 describe("General", () => {
   test("shouldn't be able to move onto square with own piece on", () => {
     const board = new ChessBoard();
