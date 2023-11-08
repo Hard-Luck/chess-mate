@@ -1,4 +1,4 @@
-import ChessBoard from "./chessboard";
+import ChessBoard from "@/classes/chessboard";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionRank } from "./position";
 
