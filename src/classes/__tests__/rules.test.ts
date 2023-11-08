@@ -6,6 +6,8 @@ import {
 import ChessBoard from "../chessboard";
 import Position from "../position";
 import { pieceIsBishop, pieceIsPawn, pieceIsRook } from "../utils";
+import { Pawn } from "../pieces";
+import { Move } from "../game";
 describe("General", () => {
   test("shouldn't be able to move onto square with own piece on", () => {
     const board = new ChessBoard();
@@ -133,4 +135,22 @@ it("shouldn't be able to move diagonally through a piece", () => {
     );
     expect(validator.validateMove()).toBe(false);
   }
+});
+
+describe("special considerations", () => {
+  describe("en Passant", () => {
+    it("should be able to take en Passant", () => {
+      const board = new ChessBoard();
+      const pawn = new Pawn("white", "A", 5);
+      const previousMove = [new Position("B", 7), new Position("B", 5)] as Move;
+      const validator = new PawnMoveValidator(
+        pawn,
+        new Position("A", 5),
+        new Position("B", 6),
+        board,
+        previousMove
+      );
+      expect(validator.validateMove()).toBe(true);
+    });
+  });
 });

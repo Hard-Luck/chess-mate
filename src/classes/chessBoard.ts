@@ -68,7 +68,7 @@ export default class ChessBoard {
     const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
     return this.board[position.currentRank - 1][fileAsNumber];
   }
-  private setPosition(position: Position, piece: Piece) {
+  public setPosition(position: Position, piece: Piece) {
     const fileAsNumber = "ABCDEFGH".indexOf(position.currentFile);
     this.board[position.currentRank - 1][fileAsNumber] = piece;
   }

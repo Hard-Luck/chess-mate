@@ -4,14 +4,15 @@ Interface to play chess built in typescript using react
 
 Still to do:
 
-- Available moves list - Done
-- En Passant
+- En Passant - Done
+- Available moves list - NEEDS REDO
 - Checks
 - Castling
 - Square Highlighting
 - Win conditions (checkmate/stalemate)
+- MORE TESTS
 - Notation Class
-- Previous moves list
+- Previous moves list (display)
 - export games
 - read PNGs
 

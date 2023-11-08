@@ -28,6 +28,7 @@ export default class Moves {
   }
   public nextPlayer() {
     this.playerTurn = this.playerTurn === "white" ? "black" : "white";
+    if (this.playerTurn === "white") this.nextTurn();
   }
   public addMove(move: Move) {
     this.lastMove = move;

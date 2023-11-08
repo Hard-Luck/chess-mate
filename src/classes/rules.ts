@@ -25,13 +25,39 @@ class Rules {
     this.moves = new Moves();
     this.board = board;
   }
+  public isLegalEnPassantMove(from: Position, to: Position) {
+    const piece = this.board.getPieceFromPosition(from);
+    if (!pieceIsPawn(piece)) return false;
+    const validator = new PawnMoveValidator(
+      piece,
+      from,
+      to,
+      this.board,
+      this.moves.previousMove
+    );
+    return validator.isEnPassantMove();
+  }
+  public captureEnPassant() {
+    if (!this.moves.previousMove) throw new Error("No previous move");
+    const previousTo = this.moves.previousMove[1];
+    const capturedPiece = this.board.getPieceFromPosition(previousTo);
+    if (!capturedPiece) throw new Error("No captured piece");
+    capturedPiece.isCaptured = true;
+    this.board.setPosition(previousTo, null);
+  }
   public isLegalMove(from: Position, to: Position): boolean {
     const piece = this.board.getPieceFromPosition(from);
 
     if (!piece) return false;
 
     if (pieceIsPawn(piece)) {
-      const validator = new PawnMoveValidator(piece, from, to, this.board);
+      const validator = new PawnMoveValidator(
+        piece,
+        from,
+        to,
+        this.board,
+        this.moves.previousMove
+      );
       return validator.validateMove();
     }
     if (pieceIsKnight(piece)) {

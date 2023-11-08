@@ -42,7 +42,6 @@ function useGame() {
         setBoard(newBoard);
         setAvailableMoves({});
       } catch (err) {
-        console.log(err);
         setSelectedSquare(null);
         setAvailableMoves({});
       }

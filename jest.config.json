@@ -1,5 +1,6 @@
 {
   "preset": "ts-jest",
+  "testPathIgnorePatterns": ["<rootDir>/src/classes/__tests__/chessboards/*"],
   "testEnvironment": "node",
   "moduleDirectories": ["node_modules", "src"],
   "moduleNameMapper": {
