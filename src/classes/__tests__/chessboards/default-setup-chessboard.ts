@@ -1,7 +1,6 @@
-import Game from "@/classes/game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
 
-const startingPositions = [
+export const defaultSetUpBoard = [
   [
     new Rook("white", "A", 1),
     new Knight("white", "B", 1),
@@ -49,14 +48,3 @@ const startingPositions = [
     new Rook("black", "H", 8),
   ],
 ];
-
-describe("Game", () => {
-  it("should set up pieces in starting positions", () => {
-    const game = new Game();
-    expect(game.state).toMatchObject(startingPositions);
-  });
-  test("turn number defaults to 1", () => {
-    const game = new Game();
-    expect(game.turnNumber).toBe(1);
-  });
-});

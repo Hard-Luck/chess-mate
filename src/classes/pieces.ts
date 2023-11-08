@@ -1,5 +1,4 @@
 import Position, { PositionFile, PositionRank } from "@/classes/position";
-import ChessBoard from "./chessboard";
 abstract class Piece {
   private position: Position;
   private color: "black" | "white";
@@ -31,8 +30,11 @@ abstract class Piece {
   set isCaptured(isCaptured: boolean) {
     this.captured = isCaptured;
   }
+  set currentPosition(position: Position) {
+    this.position = position;
+  }
 
-  abstract canMoveTo(position: Position, board?: ChessBoard): boolean;
+  abstract canMoveTo(position: Position): boolean;
 }
 
 export class Pawn extends Piece {

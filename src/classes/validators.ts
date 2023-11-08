@@ -2,14 +2,14 @@ import ChessBoard from "./chessboard";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionRank } from "./position";
 
-// TODO - Pawn cant seem to pass anothother piece or even move after they have mpved 2
 // No pieces seem to be able to move twice
+// bishops can only move 1 square
 
 export type PieceToValidate = Pawn | Rook | Bishop | Knight | Queen | King;
 export abstract class MoveValidator<T extends PieceToValidate> {
   protected piece: T;
-  protected to: Position;
   protected from: Position;
+  protected to: Position;
   protected board: ChessBoard;
   constructor(piece: T, from: Position, to: Position, board: ChessBoard) {
     this.from = from;
@@ -32,15 +32,16 @@ export class PawnMoveValidator extends MoveValidator<Pawn> {
     if (!super.validateMove()) return false;
     const { file, rank } = this.from.distanceFrom(this.to);
     const forward = this.piece.direction;
-    if (Math.abs(rank) === 2) {
-      const oneSpaceAhead = new Position(
-        this.to.currentFile,
-        (this.to.currentRank - forward) as PositionRank
-      );
-      const pieceBetweenCheck = this.board.getPieceFromPosition(oneSpaceAhead);
-      if (pieceBetweenCheck) return false;
+    if (Math.abs(file) === 1) {
+      if (this.board.getPieceFromPosition(this.to) !== null) return true;
+      return false;
     }
-    if (this.board.getPieceFromPosition(this.to) !== null) return false;
+    const oneSpaceAhead = new Position(
+      this.from.currentFile,
+      (this.from.currentRank + forward) as PositionRank
+    );
+    const pieceBetweenCheck = this.board.getPieceFromPosition(oneSpaceAhead);
+    if (pieceBetweenCheck) return false;
     if (this.piece.onStartRank()) {
       return (rank === forward || rank === forward * 2) && file === 0;
     }
@@ -60,17 +61,22 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
     if (!super.validateMove()) return false;
     const distance = this.from.distanceFrom(this.to);
     const { rank, file } = distance;
+    console.log(rank, file);
+
     const absoluteDifference = Math.abs(rank);
-    const rankIndex = this.from.currentRank;
-    const rankUnits = rank / absoluteDifference;
-    const fileUnits = file / absoluteDifference;
+    const currentRank = this.from.currentRank;
+    const rankDirection = rank < 0 ? -1 : 1;
+    const fileDirection = file < 0 ? -1 : 1;
     for (let i = 1; i < absoluteDifference; i++) {
+      console.log(i * fileDirection);
       const fileToCheck = ChessBoard.fileFromDistance(
         this.from.currentFile,
-        i * fileUnits
+        i * fileDirection
       );
-      const rankToCheck = rankIndex + i * rankUnits;
-      const positionToCheck = Position.from(fileToCheck, rankToCheck);
+      const rankToCheck = (currentRank + i * rankDirection) as PositionRank;
+      const positionToCheck = new Position(fileToCheck, rankToCheck);
+      console.log(rankToCheck, positionToCheck);
+
       if (this.board.getPieceFromPosition(positionToCheck)) {
         return false;
       }

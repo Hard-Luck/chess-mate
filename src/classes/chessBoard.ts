@@ -61,7 +61,7 @@ export default class ChessBoard {
     if (fileAsNumber + distance < 0 || fileAsNumber + distance > 7) {
       throw new Error("File out of bounds");
     }
-    const newFile = "ABCDEFGH"[fileAsNumber - distance];
+    const newFile = "ABCDEFGH"[fileAsNumber + distance];
     return newFile as PositionFile;
   }
   public getPieceFromPosition(position: Position) {
@@ -81,6 +81,7 @@ export default class ChessBoard {
       potentiallyCapturedPiece.isCaptured = true;
     }
     this.setPosition(to, piece);
+    piece.currentPosition = to;
   }
   public kingLocation(color: "white" | "black") {
     const king = this.state
