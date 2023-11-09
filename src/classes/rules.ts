@@ -29,10 +29,9 @@ class Rules {
     const piece = this.board.getPieceFromPosition(from);
     if (!pieceIsPawn(piece)) return false;
     const validator = new PawnMoveValidator(
-      piece,
-      from,
-      to,
       this.board,
+      piece,
+      to,
       this.moves.previousMove
     );
     return validator.isEnPassantMove();
@@ -52,60 +51,51 @@ class Rules {
 
     if (pieceIsPawn(piece)) {
       const validator = new PawnMoveValidator(
-        piece,
-        from,
-        to,
         this.board,
+        piece,
+        to,
         this.moves.previousMove
       );
       return validator.validateMove();
     }
     if (pieceIsKnight(piece)) {
-      const validator = new KnightMoveValidator(piece, from, to, this.board);
+      const validator = new KnightMoveValidator(this.board, piece, to);
       return validator.validateMove();
     }
     if (pieceIsBishop(piece)) {
-      const validator = new DiagonalMoveValidator(piece, from, to, this.board);
+      const validator = new DiagonalMoveValidator(this.board, piece, to);
       return validator.validateMove();
     }
     if (pieceIsRook(piece)) {
       const verticalValidator = new VerticalMoveValidator(
+        this.board,
         piece,
-        from,
-        to,
-        this.board
+        to
       );
       const horizontalValidator = new HorizontalMoveValidator(
+        this.board,
         piece,
-        from,
-        to,
-        this.board
+        to
       );
-      console.log(horizontalValidator.validateMove(), "horizontal");
-      console.log(verticalValidator.validateMove(), "vertical");
-
       return (
         verticalValidator.validateMove() || horizontalValidator.validateMove()
       );
     }
     if (pieceIsQueen(piece)) {
       const verticalValidator = new VerticalMoveValidator(
+        this.board,
         piece,
-        from,
-        to,
-        this.board
+        to
       );
       const horizontalValidator = new HorizontalMoveValidator(
+        this.board,
         piece,
-        from,
-        to,
-        this.board
+        to
       );
       const diagonalValidator = new DiagonalMoveValidator(
+        this.board,
         piece,
-        from,
-        to,
-        this.board
+        to
       );
       return (
         verticalValidator.validateMove() ||
@@ -114,7 +104,7 @@ class Rules {
       );
     }
     if (pieceIsKing(piece)) {
-      const validator = new KingMoveValidator(piece, from, to, this.board);
+      const validator = new KingMoveValidator(this.board, piece, to);
       return validator.validateMove();
     }
     return false;
