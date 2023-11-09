@@ -125,6 +125,30 @@ export class KnightMoveValidator extends MoveValidator<Knight> {
     if (!super.validateMove()) return false;
     return true;
   }
+  possibleMoves(): Position[] {
+    const moves = [] as Position[];
+    const knightMoves = [
+      [-2, -1],
+      [-1, -2],
+      [2, -1],
+      [1, -2],
+      [-2, 1],
+      [-1, 2],
+      [2, 1],
+      [1, 2],
+    ];
+    for (const move of knightMoves) {
+      const { currentFile, currentRank: rank } = this.piece.currentPosition;
+      const fileToCheck = ChessBoard.fileFromDistance(currentFile, move[0]);
+      const rankToCheck = (rank + move[1]) as PositionRank;
+      if (!fileToCheck || rankToCheck < 1 || rankToCheck > 8) {
+        continue;
+      }
+      this.potentialMove = new Position(fileToCheck, rankToCheck);
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+    return moves;
+  }
 }
 
 export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {

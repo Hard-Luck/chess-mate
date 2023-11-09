@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import ChessBoard from "./board";
 import { Piece } from "./game";
 import Moves from "./moves";
@@ -118,6 +119,10 @@ class Rules {
         undefined,
         this.moves.previousMove
       );
+      return validator.possibleMoves();
+    }
+    if (pieceIsKnight(piece)) {
+      const validator = new KnightMoveValidator(this.board, piece);
       return validator.possibleMoves();
     }
   }
