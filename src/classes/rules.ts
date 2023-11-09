@@ -110,7 +110,7 @@ class Rules {
     }
     return false;
   }
-  public possibleMovesFor(piece: Piece) {
+  public possibleMovesFor(piece: Piece): Position[] {
     if (pieceIsPawn(piece)) {
       const validator = new PawnMoveValidator(
         this.board,
@@ -150,6 +150,11 @@ class Rules {
       const diagonalMoves = diagonalValidator.possibleMoves();
       return [...verticalMoves, ...horizontalMoves, ...diagonalMoves];
     }
+    if (pieceIsKing(piece)) {
+      const validator = new KingMoveValidator(this.board, piece);
+      return validator.possibleMoves();
+    }
+    throw new Error("Invalid piece");
   }
 }
 export default Rules;

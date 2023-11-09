@@ -269,10 +269,24 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
 
 export class KingMoveValidator extends MoveValidator<King> {
   public validateMove(): boolean {
+    console.log("here", super.validateMove());
+
     if (!super.validateMove()) return false;
     return true;
   }
   public possibleMoves(): Position[] {
-    return [] as Position[];
+    const moves: Position[] = [];
+    const { currentRank, currentFile } = this.piece.currentPosition;
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (i === 0 && j === 0) continue;
+        const rank = (currentRank + i) as PositionRank;
+        const file = ChessBoard.fileFromDistance(currentFile, j);
+        if (!file || rank < 1 || rank > 8) continue;
+        this.potentialMove = new Position(file, rank);
+        if (this.validateMove()) moves.push(this.potentialMove);
+      }
+    }
+    return moves;
   }
 }
