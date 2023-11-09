@@ -88,9 +88,9 @@ export class PawnMoveValidator extends MoveValidator<Pawn> {
     if (!(Math.abs(rank) === 2 && file === 0)) return false;
     return previousFrom.currentRank === opposingStartRank;
   }
-  availableMoves(): Position[] {
+  possibleMoves(): Position[] {
     const moves: Position[] = [];
-    const { currentFile, currentRank } = this.from;
+    const { currentFile, currentRank } = this.piece.currentPosition;
     const isWhitePiece = this.piece.pieceColor === "white";
     const direction = isWhitePiece ? 1 : -1;
     const startingRank = isWhitePiece ? 2 : 7;
@@ -102,19 +102,15 @@ export class PawnMoveValidator extends MoveValidator<Pawn> {
     }
     this.potentialMove = new Position(currentFile, rankAhead);
     if (this.validateMove()) moves.push(this.potentialMove);
-    const currentFileAsIndex = Position.fileToNumber(currentFile);
-    const leftFile = currentFileAsIndex - 1;
-    const rightFile = currentFileAsIndex + 1;
-    if (leftFile >= 1) {
-      this.potentialMove = Position.from(
-        Position.numberToFile(leftFile),
-        currentRank + 1 * direction
-      );
+    const leftFile = ChessBoard.fileFromDistance(currentFile, -1);
+    const rightFile = ChessBoard.fileFromDistance(currentFile, 1);
+    if (leftFile) {
+      this.potentialMove = Position.from(leftFile, currentRank + 1 * direction);
       if (this.validateMove()) moves.push(this.potentialMove);
     }
-    if (rightFile < 8) {
+    if (rightFile) {
       this.potentialMove = Position.from(
-        Position.numberToFile(rightFile),
+        rightFile,
         currentRank + 1 * direction
       );
       if (this.validateMove()) moves.push(this.potentialMove);
@@ -148,6 +144,7 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
         this.from.currentFile,
         i * fileDirection
       );
+      if (!fileToCheck) return false;
       const rankToCheck = (currentRank + i * rankDirection) as PositionRank;
       const positionToCheck = new Position(fileToCheck, rankToCheck);
       if (this.board.getPieceFromPosition(positionToCheck)) return false;
@@ -192,6 +189,7 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
         this.from.currentFile,
         i * direction
       );
+      if (!fileToCheck) return false;
       const current = Position.from(fileToCheck, this.from.currentRank);
       if (this.board.getPieceFromPosition(current)) {
         return false;

@@ -103,12 +103,12 @@ describe("PawnMoveValidator", () => {
       }
     });
   });
-  describe("availableMoves", () => {
+  describe("possibleMoves", () => {
     it("should return available moves for unmoved white pawn", () => {
       const board = new ChessBoard();
       const pawn = new Pawn("white", "A", 2);
       const validator = new PawnMoveValidator(board, pawn);
-      const moves = validator.availableMoves();
+      const moves = validator.possibleMoves();
       const expectedMoves = [new Position("A", 3), new Position("A", 4)];
       expect(moves.length).toBe(2);
       expectedMoves.forEach((move) => {
@@ -119,7 +119,7 @@ describe("PawnMoveValidator", () => {
       const board = new ChessBoard();
       const pawn = new Pawn("black", "A", 7);
       const validator = new PawnMoveValidator(board, pawn);
-      const moves = validator.availableMoves();
+      const moves = validator.possibleMoves();
       const expectedMoves = [new Position("A", 6), new Position("A", 5)];
       expect(moves.length).toBe(2);
       expectedMoves.forEach((move) => {
@@ -134,7 +134,7 @@ describe("PawnMoveValidator", () => {
         new Position("B", 5),
       ]);
       const expectedMoves = [new Position("B", 6), new Position("A", 6)];
-      const moves = validator.availableMoves();
+      const moves = validator.possibleMoves();
       expect(moves.length).toBe(2);
       expectedMoves.forEach((move) => {
         expect(moves).toContainEqual(move);
@@ -146,7 +146,7 @@ describe("PawnMoveValidator", () => {
       board.setPosition(new Position("A", 4), pawn);
       board.setPosition(new Position("B", 5), new Pawn("black", "B", 5));
       const validator = new PawnMoveValidator(board, pawn);
-      const moves = validator.availableMoves();
+      const moves = validator.possibleMoves();
       const expectedMoves = [new Position("A", 5), new Position("B", 5)];
       expect(moves.length).toBe(2);
       expectedMoves.forEach((move) => {

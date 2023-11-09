@@ -11,7 +11,7 @@
     }
     return false;
   }
-  availableMoves(board: ChessBoard): Position[] {
+  possibleMoves(board: ChessBoard): Position[] {
     return this.availableStraightMoves(board);
   }
 
@@ -23,7 +23,7 @@
     if (!(Math.abs(distance.rank) === Math.abs(distance.file))) return false;
     return this.checkDiagonal(distance, board);
   }
-  availableMoves(board: ChessBoard): Position[] {
+  possibleMoves(board: ChessBoard): Position[] {
     return this.availableDiagonals(board);
   }
 
@@ -35,7 +35,7 @@
 
 
     QUEEN
-    availableMoves(board: ChessBoard): Position[] {
+    possibleMoves(board: ChessBoard): Position[] {
     const moves = [] as Position[];
     const knightMoves = [
       [-2, -1],
@@ -81,7 +81,7 @@
     }
     return false;
   }
-  availableMoves(board: ChessBoard): Position[] {
+  possibleMoves(board: ChessBoard): Position[] {
     const diagonalMoves = this.availableDiagonals(board);
     const straightMoves = this.availableStraightMoves(board);
     const moves = [...diagonalMoves, ...straightMoves];
@@ -94,7 +94,7 @@
    const pieceCheck = board.getPieceFromPosition(position);
   if (pieceCheck?.pieceColor === this.pieceColor) return false;
   const { rank, file } = this.currentPosition.distanceFrom(position);
-  availableMoves(board: ChessBoard): Position[] {
+  possibleMoves(board: ChessBoard): Position[] {
     const moves: Position[] = [];
     const { currentRank, currentFile } = this.currentPosition;
     const fileAsNum = Position.fileToNumber(currentFile);
@@ -119,9 +119,9 @@
     const { currentRank: rank, currentFile: file } = kingLocation;
     for (const piece of this.board.state.flat()) {
       if (piece?.pieceColor !== king?.pieceColor) {
-        const availableMoves = piece?.availableMoves(this.board);
-        if (!availableMoves) continue;
-        for (const move of availableMoves) {
+        const possibleMoves = piece?.possibleMoves(this.board);
+        if (!possibleMoves) continue;
+        for (const move of possibleMoves) {
           if (move.currentRank === rank && move.currentFile === file) {
             return true;
           }
@@ -180,7 +180,7 @@
     }
     return [...this.board.state];
   }
-  abstract availableMoves(board: ChessBoard): Position[];
+  abstract possibleMoves(board: ChessBoard): Position[];
 
  
  

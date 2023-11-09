@@ -28,6 +28,9 @@ export default class Game {
   get turnColor() {
     return this.rules.moves.playerTurnColor;
   }
+  public possibleMovesFor(piece: Piece): Position[] {
+    return this.rules.possibleMovesFor(piece)!;
+  }
   public makeMove(from: Position, to: Position): Board {
     if (this.rules.isLegalEnPassantMove(from, to)) {
       this.rules.captureEnPassant();

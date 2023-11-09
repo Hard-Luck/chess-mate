@@ -6,7 +6,7 @@ function useGame() {
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
-  const [availableMoves, setAvailableMoves] = useState<Record<string, boolean>>(
+  const [possibleMoves, setPossibleMoves] = useState<Record<string, boolean>>(
     {}
   );
   const turnColor = game.turnColor;
@@ -24,29 +24,30 @@ function useGame() {
     if (selectedSquare === null) {
       if (piece?.pieceColor === game.turnColor) {
         setSelectedSquare(position);
-        // const possibleMoves = piece?.availableMoves(game) || ([] as Position[]);
-        // const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
-        //   (acc, curr) => {
-        //     const index = `${curr.currentFile}${curr.currentRank}` as string;
-        //     acc[index] = true;
-        //     return acc;
-        //   },
-        //   {}
-        // );
-        //setAvailableMoves(movesIndexes);
+        const possibleMoves =
+          game.possibleMovesFor(piece) || ([] as Position[]);
+        const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
+          (acc, curr) => {
+            const index = `${curr.currentFile}${curr.currentRank}` as string;
+            acc[index] = true;
+            return acc;
+          },
+          {}
+        );
+        setPossibleMoves(movesIndexes);
       }
     } else {
       try {
         const newBoard = game.makeMove(selectedSquare, position);
         setSelectedSquare(null);
         setBoard(newBoard);
-        setAvailableMoves({});
+        setPossibleMoves({});
       } catch (err) {
         setSelectedSquare(null);
-        setAvailableMoves({});
+        setPossibleMoves({});
       }
     }
   }
-  return { board, resetGame, selectSquare, turnColor, availableMoves };
+  return { board, resetGame, selectSquare, turnColor, possibleMoves };
 }
 export default useGame;

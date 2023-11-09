@@ -56,10 +56,13 @@ export default class ChessBoard {
     ];
     return board;
   }
-  static fileFromDistance(file: PositionFile, distance: number): PositionFile {
+  static fileFromDistance(
+    file: PositionFile,
+    distance: number
+  ): PositionFile | null {
     const fileAsNumber = "ABCDEFGH".indexOf(file);
     if (fileAsNumber + distance < 0 || fileAsNumber + distance > 7) {
-      throw new Error("File out of bounds");
+      return null;
     }
     const newFile = "ABCDEFGH"[fileAsNumber + distance];
     return newFile as PositionFile;

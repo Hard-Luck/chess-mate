@@ -1,4 +1,5 @@
 import ChessBoard from "./board";
+import { Piece } from "./game";
 import Moves from "./moves";
 import Position from "./position";
 import {
@@ -108,6 +109,17 @@ class Rules {
       return validator.validateMove();
     }
     return false;
+  }
+  public possibleMovesFor(piece: Piece) {
+    if (pieceIsPawn(piece)) {
+      const validator = new PawnMoveValidator(
+        this.board,
+        piece,
+        undefined,
+        this.moves.previousMove
+      );
+      return validator.possibleMoves();
+    }
   }
 }
 export default Rules;

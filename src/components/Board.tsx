@@ -4,7 +4,7 @@ import Square from "./Square";
 import useGame from "@/hooks/useGame";
 
 function Board() {
-  const { board, resetGame, selectSquare, turnColor, availableMoves } =
+  const { board, resetGame, selectSquare, turnColor, possibleMoves } =
     useGame();
   const [size, setSize] = useState(
     Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
@@ -43,7 +43,7 @@ function Board() {
                   rank={rank}
                   piece={piece}
                   size={size}
-                  selected={availableMoves[`${file}${rank}`]}
+                  selected={possibleMoves[`${file}${rank}`]}
                 />
               );
             });
