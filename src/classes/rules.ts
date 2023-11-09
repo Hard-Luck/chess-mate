@@ -1,4 +1,3 @@
-import { pick } from "lodash";
 import ChessBoard from "./board";
 import { Piece } from "./game";
 import Moves from "./moves";
@@ -124,6 +123,32 @@ class Rules {
     if (pieceIsKnight(piece)) {
       const validator = new KnightMoveValidator(this.board, piece);
       return validator.possibleMoves();
+    }
+    if (pieceIsBishop(piece)) {
+      const validator = new DiagonalMoveValidator(this.board, piece);
+      return validator.possibleMoves();
+    }
+    if (pieceIsRook(piece)) {
+      const verticalValidator = new VerticalMoveValidator(this.board, piece);
+      const horizontalValidator = new HorizontalMoveValidator(
+        this.board,
+        piece
+      );
+      const verticalMoves = verticalValidator.possibleMoves();
+      const horizontalMoves = horizontalValidator.possibleMoves();
+      return [...verticalMoves, ...horizontalMoves];
+    }
+    if (pieceIsQueen(piece)) {
+      const verticalValidator = new VerticalMoveValidator(this.board, piece);
+      const horizontalValidator = new HorizontalMoveValidator(
+        this.board,
+        piece
+      );
+      const diagonalValidator = new DiagonalMoveValidator(this.board, piece);
+      const verticalMoves = verticalValidator.possibleMoves();
+      const horizontalMoves = horizontalValidator.possibleMoves();
+      const diagonalMoves = diagonalValidator.possibleMoves();
+      return [...verticalMoves, ...horizontalMoves, ...diagonalMoves];
     }
   }
 }

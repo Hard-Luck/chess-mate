@@ -24,6 +24,7 @@ export abstract class MoveValidator<T extends PieceToValidate> {
     const ownPiece = pieceOnEndSquare?.pieceColor === this.piece?.pieceColor;
     return !ownPiece;
   }
+  abstract possibleMoves(): Position[];
 }
 
 export class PawnMoveValidator extends MoveValidator<Pawn> {
@@ -175,6 +176,28 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
     }
     return true;
   }
+  public possibleMoves(): Position[] {
+    const { currentFile, currentRank } = this.piece.currentPosition;
+    const moves: Position[] = [];
+    const directions: [number, number][] = [
+      [-1, -1],
+      [-1, 1],
+      [1, -1],
+      [1, 1],
+    ];
+    directions.forEach(([fileOffset, rankOffset]) => {
+      for (let i = 1; i <= 8; i++) {
+        const file = ChessBoard.fileFromDistance(currentFile, fileOffset * i);
+        const newRank = (currentRank + rankOffset * i) as PositionRank;
+        const rankInBounds = newRank >= 1 && newRank <= 8;
+        if (file && rankInBounds) {
+          this.potentialMove = new Position(file, newRank);
+          if (this.validateMove()) moves.push(this.potentialMove);
+        } else break;
+      }
+    });
+    return moves;
+  }
 }
 
 export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
@@ -197,6 +220,17 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
       }
     }
     return true;
+  }
+  public possibleMoves(): Position[] {
+    const moves = [] as Position[];
+    for (let i = 1; i <= 8; i++) {
+      this.potentialMove = new Position(
+        this.from.currentFile,
+        i as PositionRank
+      );
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+    return moves;
   }
 }
 
@@ -221,11 +255,24 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
     }
     return true;
   }
+  public possibleMoves(): Position[] {
+    const moves = [] as Position[];
+    for (let i = 0; i < 8; i++) {
+      const file = ChessBoard.fileFromDistance("A", i);
+      if (!file) continue;
+      this.potentialMove = new Position(file, this.from.currentRank);
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+    return moves;
+  }
 }
 
 export class KingMoveValidator extends MoveValidator<King> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
     return true;
+  }
+  public possibleMoves(): Position[] {
+    return [] as Position[];
   }
 }

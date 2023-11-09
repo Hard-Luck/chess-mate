@@ -1,70 +1,10 @@
  
 
- describe("possibleMoves", () => {
-    it("should return available moves for rook", () => {
-      const game = new Game();
-      game.makeMove(new Position("A", 2), new Position("A", 4));
-      game.makeMove(new Position("H", 7), new Position("H", 6));
-      game.makeMove(new Position("A", 4), new Position("A", 5));
-      game.makeMove(new Position("G", 7), new Position("G", 6));
-      game.makeMove(new Position("A", 1), new Position("A", 4));
-      game.makeMove(new Position("F", 7), new Position("F", 6));
-      game.makeMove(new Position("A", 4), new Position("D", 4));
-      game.makeMove(new Position("A", 7), new Position("A", 6));
-      const rook = new Rook("white", "D", 4);
-      const moves = rook.possibleMoves(game);
-      const expectedMoves = [
-        new Position("D", 3),
-        new Position("D", 5),
-        new Position("D", 6),
-        new Position("D", 7),
-        new Position("A", 4),
-        new Position("B", 4),
-        new Position("C", 4),
-        new Position("E", 4),
-        new Position("F", 4),
-        new Position("G", 4),
-        new Position("H", 4),
-      ];
-      expect(moves.length).toBe(11);
-      expectedMoves.forEach((move) => {
-        expect(moves).toContainEqual(move);
-      });
-    });
-  });
+
   it("should return available moves when a rook can capture", () => {
     const game = new Game();
     game.makeMove(new Position("A", 2), new Position("A", 4));
   });
-BISHOP
-
-  describe("possibleMoves", () => {
-    it("should return available moves", () => {
-      const game = new Game();
-      game.makeMove(new Position("D", 2), new Position("D", 3));
-      game.makeMove(new Position("H", 7), new Position("H", 6));
-      game.makeMove(new Position("C", 1), new Position("E", 3));
-      game.makeMove(new Position("H", 6), new Position("H", 5));
-      const bishop = new Bishop("white", "E", 3);
-      const moves = bishop.possibleMoves(game);
-      const expectedMoves = [
-        new Position("C", 1),
-        new Position("D", 2),
-        new Position("F", 4),
-        new Position("G", 5),
-        new Position("H", 6),
-        new Position("D", 4),
-        new Position("C", 5),
-        new Position("B", 6),
-        new Position("A", 7),
-      ];
-      expect(moves.length).toBe(9);
-      moves.forEach((move) => {
-        expect(expectedMoves).toContainEqual(move);
-      });
-    });
-  });
-
   QUeen
   describe("possibleMoves", () => {
     const game = new Game();
@@ -99,37 +39,3 @@ BISHOP
     });
   });
 
-
-GAME
-
-it("should change move colour after a move is made", () => {
-    const game = new Game();
-    game.makeMove(new Position("A", 2), new Position("A", 4));
-    expect(game.turnColor).toBe("black");
-  });
-  it("should increase turn number after a pair of moves", () => {
-    const game = new Game();
-    game.makeMove(new Position("A", 2), new Position("A", 4));
-    game.makeMove(new Position("A", 7), new Position("A", 5));
-    expect(game.turnNumber).toBe(2);
-  });
-  test("Piece should move to new position on the board", () => {
-    const game = new Game();
-    const a2Pawn = game.state[1][0];
-    game.makeMove(new Position("A", 2), new Position("A", 4));
-    expect(a2Pawn?.currentPosition).toEqual(new Position("A", 4));
-    expect(game.state[1][0]).toBeNull();
-  });
-  test("update last move after a move is taken", () => {
-    const game = new Game();
-    game.makeMove(new Position("A", 2), new Position("A", 4));
-    expect(game.moves.previousMove).toEqual([
-      new Position("A", 2),
-      new Position("A", 4),
-    ]);
-    game.makeMove(new Position("A", 7), new Position("A", 5));
-    expect(game.moves.previousMove).toEqual([
-      new Position("A", 7),
-      new Position("A", 5),
-    ]);
-  });
