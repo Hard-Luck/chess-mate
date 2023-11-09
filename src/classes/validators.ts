@@ -4,19 +4,23 @@ import Position, { PositionRank } from "./position";
 
 export type PieceToValidate = Pawn | Rook | Bishop | Knight | Queen | King;
 export abstract class MoveValidator<T extends PieceToValidate> {
+  protected board: ChessBoard;
   protected piece: T;
   protected from: Position;
-  protected to: Position;
-  protected board: ChessBoard;
-  constructor(piece: T, from: Position, to: Position, board: ChessBoard) {
-    this.from = from;
-    this.to = to;
+  protected to: Position | null;
+  protected potentialMove: Position | null;
+  constructor(board: ChessBoard, piece: T, to?: Position) {
+    this.from = piece.currentPosition;
+    this.to = to || null;
     this.board = board;
     this.piece = piece;
+    this.potentialMove = null;
   }
   public validateMove(): boolean {
-    if (!this.piece.canMoveTo(this.to)) return false;
-    const pieceOnEndSquare = this.board.getPieceFromPosition(this.to);
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
+    if (!this.piece.canMoveTo(to)) return false;
+    const pieceOnEndSquare = this.board.getPieceFromPosition(to);
     const ownPiece = pieceOnEndSquare?.pieceColor === this.piece?.pieceColor;
     return !ownPiece;
   }
@@ -25,24 +29,26 @@ export abstract class MoveValidator<T extends PieceToValidate> {
 export class PawnMoveValidator extends MoveValidator<Pawn> {
   private previousMove: [Position, Position] | null;
   constructor(
-    piece: Pawn,
-    from: Position,
-    to: Position,
     board: ChessBoard,
+    piece: Pawn,
+    to?: Position,
     previousMove?: [Position, Position] | null
   ) {
-    super(piece, from, to, board);
+    super(board, piece, to);
     this.previousMove = previousMove || null;
+    this.potentialMove = null;
   }
   validateMove(): boolean {
     if (!super.validateMove()) return false;
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
     if (this.isEnPassantMove()) {
       return this.validateEnPassantMove();
     }
-    const { file, rank } = this.from.distanceFrom(this.to);
+    const { file, rank } = this.from.distanceFrom(to);
     const forward = this.piece.direction;
     if (Math.abs(file) === 1) {
-      if (this.board.getPieceFromPosition(this.to) !== null) return true;
+      if (this.board.getPieceFromPosition(to) !== null) return true;
       return false;
     }
     const oneSpaceAhead = new Position(
@@ -58,14 +64,16 @@ export class PawnMoveValidator extends MoveValidator<Pawn> {
   }
   public isEnPassantMove(): boolean {
     if (!this.previousMove) return false;
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
     const enPassantRank = this.piece.pieceColor === "white" ? 5 : 4;
     const currentRank = this.piece.currentPosition.currentRank;
     const enPassantFile = this.previousMove[1].currentFile;
-    if (this.to.currentFile !== enPassantFile) return false;
+    if (to.currentFile !== enPassantFile) return false;
     if (!(enPassantRank === currentRank)) return false;
-    const { file, rank } = this.from.distanceFrom(this.to);
+    const { file, rank } = this.from.distanceFrom(to);
     const forward = this.piece.direction;
-    const emptyPosition = this.board.getPieceFromPosition(this.to) === null;
+    const emptyPosition = this.board.getPieceFromPosition(to) === null;
     if (emptyPosition) {
       return Math.abs(file) === 1 && rank === forward;
     }
@@ -80,6 +88,40 @@ export class PawnMoveValidator extends MoveValidator<Pawn> {
     if (!(Math.abs(rank) === 2 && file === 0)) return false;
     return previousFrom.currentRank === opposingStartRank;
   }
+  availableMoves(): Position[] {
+    const moves: Position[] = [];
+    const { currentFile, currentRank } = this.from;
+    const isWhitePiece = this.piece.pieceColor === "white";
+    const direction = isWhitePiece ? 1 : -1;
+    const startingRank = isWhitePiece ? 2 : 7;
+    const rankAhead = (this.from.currentRank + 1 * direction) as PositionRank;
+    const twoAhead = (this.from.currentRank + 2 * direction) as PositionRank;
+    if (this.from.currentRank === startingRank) {
+      this.potentialMove = new Position(currentFile, twoAhead);
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+    this.potentialMove = new Position(currentFile, rankAhead);
+    if (this.validateMove()) moves.push(this.potentialMove);
+    const currentFileAsIndex = Position.fileToNumber(currentFile);
+    const leftFile = currentFileAsIndex - 1;
+    const rightFile = currentFileAsIndex + 1;
+    if (leftFile >= 1) {
+      this.potentialMove = Position.from(
+        Position.numberToFile(leftFile),
+        currentRank + 1 * direction
+      );
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+    if (rightFile < 8) {
+      this.potentialMove = Position.from(
+        Position.numberToFile(rightFile),
+        currentRank + 1 * direction
+      );
+      if (this.validateMove()) moves.push(this.potentialMove);
+    }
+
+    return moves;
+  }
 }
 
 export class KnightMoveValidator extends MoveValidator<Knight> {
@@ -92,7 +134,9 @@ export class KnightMoveValidator extends MoveValidator<Knight> {
 export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
-    const distance = this.from.distanceFrom(this.to);
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
+    const distance = this.from.distanceFrom(to);
     const { rank, file } = distance;
     if (rank === 0 || file === 0) return false;
     const absoluteDifference = Math.abs(rank);
@@ -115,9 +159,10 @@ export class DiagonalMoveValidator extends MoveValidator<Bishop | Queen> {
 export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
-    const { rank, file } = this.from.distanceFrom(this.to);
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
+    const { rank, file } = this.from.distanceFrom(to);
     if (file !== 0) return false;
-    ``;
     const direction = rank > 0 ? 1 : -1;
     const currentFile = this.from.currentFile;
     const startRank = this.from.currentRank;
@@ -137,7 +182,9 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
 export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
-    const { file, rank } = this.from.distanceFrom(this.to);
+    const to = this.to || this.potentialMove;
+    if (!to) return false;
+    const { file, rank } = this.from.distanceFrom(to);
     if (rank !== 0) return false;
     const direction = file > 0 ? 1 : -1;
     for (let i = 1; i < Math.abs(file); i++) {
