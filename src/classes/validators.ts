@@ -269,8 +269,6 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
 
 export class KingMoveValidator extends MoveValidator<King> {
   public validateMove(): boolean {
-    console.log("here", super.validateMove());
-
     if (!super.validateMove()) return false;
     return true;
   }

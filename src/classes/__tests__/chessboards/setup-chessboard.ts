@@ -48,3 +48,6 @@ export const defaultSetUpBoard = [
     new Rook("black", "H", 8),
   ],
 ];
+export const emptyChessBoard = Array.from({ length: 8 }, () =>
+  new Array(8).fill(null)
+);

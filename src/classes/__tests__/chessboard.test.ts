@@ -1,6 +1,6 @@
 import ChessBoard from "../board";
 import Position from "../position";
-import { defaultSetUpBoard } from "./chessboards/default-setup-chessboard";
+import { defaultSetUpBoard } from "./chessboards/setup-chessboard";
 
 describe("Chessboard", () => {
   it("should set up pieces in starting positions when passed no parameter", () => {

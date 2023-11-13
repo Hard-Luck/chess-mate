@@ -6,10 +6,13 @@ import {
 } from "../validators";
 import Position from "../position";
 import { pieceIsBishop, pieceIsPawn, pieceIsRook } from "../utils";
-import { Bishop, Pawn, Rook } from "../pieces";
+import { Bishop, King, Pawn, Queen, Rook } from "../pieces";
 import { Move } from "../game";
 import ChessBoard from "../board";
+import { emptyChessBoard } from "./chessboards/setup-chessboard";
+import Rules from "../rules";
 
+beforeEach(() => jest.resetModules());
 describe("General", () => {
   test("shouldn't be able to move onto square with own piece on", () => {
     const board = new ChessBoard();
@@ -320,6 +323,55 @@ describe("special considerations", () => {
         previousMove
       );
       expect(validator.validateMove()).toBe(true);
+    });
+  });
+});
+
+describe("checks", () => {
+  describe("inCheck", () => {
+    it("should return true when king is in check", () => {
+      const board = new ChessBoard(emptyChessBoard);
+      const rules = new Rules(board);
+      const king = new King("white", "E", 1);
+      const opposingQueen = new Queen("black", "E", 8);
+      const queenPosition = opposingQueen.currentPosition;
+      const kingPosition = king.currentPosition;
+      board.setPosition(kingPosition, king);
+      board.setPosition(queenPosition, opposingQueen);
+      expect(rules.inCheck("white")).toBe(true);
+    });
+    it("should return false when king is not in check  ", () => {
+      const board = new ChessBoard(emptyChessBoard);
+      const rules = new Rules(board);
+      const king = new King("white", "A", 1);
+      const opposingQueen = new Queen("black", "E", 2);
+      const queenPosition = opposingQueen.currentPosition;
+      const kingPosition = king.currentPosition;
+      board.setPosition(kingPosition, king);
+      board.setPosition(queenPosition, opposingQueen);
+      expect(rules.inCheck("white")).toBe(false);
+    });
+    it("should return true when passed a position that would be in check", () => {
+      const board = new ChessBoard(emptyChessBoard);
+      const rules = new Rules(board);
+      const king = new King("black", "A", 8);
+      const opposingQueen = new Queen("white", "B", 2);
+      const queenPosition = opposingQueen.currentPosition;
+      const kingPosition = king.currentPosition;
+      board.setPosition(kingPosition, king);
+      board.setPosition(queenPosition, opposingQueen);
+      expect(rules.inCheck("black", new Position("B", 8))).toBe(true);
+    });
+    it("should return false when a move wouldn't be in check", () => {
+      const board = new ChessBoard(emptyChessBoard);
+      const rules = new Rules(board);
+      const king = new King("black", "A", 8);
+      const opposingQueen = new Queen("white", "B", 2);
+      const queenPosition = opposingQueen.currentPosition;
+      const kingPosition = king.currentPosition;
+      board.setPosition(kingPosition, king);
+      board.setPosition(queenPosition, opposingQueen);
+      expect(rules.inCheck("black", new Position("A", 7))).toBe(false);
     });
   });
 });

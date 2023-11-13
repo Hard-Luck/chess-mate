@@ -156,5 +156,13 @@ class Rules {
     }
     throw new Error("Invalid piece");
   }
+  public inCheck(color: "white" | "black", kingPosition?: Position) {
+    kingPosition ??= this.board.kingLocation(color);
+    for (const piece of this.board.state.flat()) {
+      if (piece === null || piece.pieceColor === color) continue;
+      if (piece.canMoveTo(kingPosition)) return true;
+    }
+    return false;
+  }
 }
 export default Rules;
