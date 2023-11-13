@@ -32,7 +32,9 @@ export default class Game {
     return this.rules.possibleMovesFor(piece)!;
   }
   public makeMove(from: Position, to: Position): Board {
-    if (this.rules.isLegalEnPassantMove(from, to)) {
+    if (this.rules.isLegalCastleMove(from, to)) {
+      this.moveCastledRook(to);
+    } else if (this.rules.isLegalEnPassantMove(from, to)) {
       this.rules.captureEnPassant();
     } else if (!this.rules.isLegalMove(from, to)) {
       return this.chessBoard.state;
@@ -44,5 +46,13 @@ export default class Game {
     this.chessBoard.movePiece(from, to);
     this.rules.moves.nextPlayer();
     this.rules.moves.addMove([from, to]);
+  }
+  private moveCastledRook(kingEndSquare: Position) {
+    const rank = kingEndSquare.currentRank;
+    const rookStartFile = kingEndSquare.currentFile === "C" ? "A" : "H";
+    const rookStartSquare = new Position(rookStartFile, rank);
+    const rookEndFile = kingEndSquare.currentFile === "G" ? "F" : "D";
+    const endSquare = new Position(rookEndFile, rank);
+    this.chessBoard.movePiece(rookStartSquare, endSquare);
   }
 }

@@ -254,7 +254,6 @@ describe("VerticalMoveValidator", () => {
         new Position("A", 6),
         new Position("A", 7),
       ];
-      console.log(moves);
       expect(moves.length).toBe(6);
       moves.forEach((move) => {
         expect(expectedMoves).toContainEqual(move);
