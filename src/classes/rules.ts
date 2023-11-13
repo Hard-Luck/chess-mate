@@ -26,6 +26,12 @@ class Rules {
     this.moves = new Moves();
     this.board = board;
   }
+  public isLegalCastleMove(from: Position, to: Position) {
+    const piece = this.board.getPieceFromPosition(from);
+    if (!pieceIsKing(piece)) return false;
+    const validator = new KingMoveValidator(this.board, piece, to);
+    return validator.isCastlingMove();
+  }
   public isLegalEnPassantMove(from: Position, to: Position) {
     const piece = this.board.getPieceFromPosition(from);
     if (!pieceIsPawn(piece)) return false;

@@ -254,6 +254,7 @@ describe("VerticalMoveValidator", () => {
         new Position("A", 6),
         new Position("A", 7),
       ];
+      console.log(moves);
       expect(moves.length).toBe(6);
       moves.forEach((move) => {
         expect(expectedMoves).toContainEqual(move);
@@ -382,7 +383,7 @@ describe("special considerations", () => {
         const board = new ChessBoard(emptyChessBoard);
         const king = new King("white", "E", 1);
         const rook = new Rook("white", "A", 1);
-        const opposingQueen = new Queen("black", "B", 8);
+        const opposingQueen = new Queen("black", "C", 8);
         board.setPosition(king.currentPosition, king);
         board.setPosition(rook.currentPosition, rook);
         board.setPosition(opposingQueen.currentPosition, opposingQueen);
@@ -410,6 +411,17 @@ describe("special considerations", () => {
         );
         expect(validator.validateCastlingMove()).toBe(false);
       });
+    });
+    it("should show castling moves in possible moves", () => {
+      const emptyChessBoard = generateEmptyChessBoard();
+      const board = new ChessBoard(emptyChessBoard);
+      const king = new King("white", "E", 1);
+      const rook = new Rook("white", "A", 1);
+      board.setPosition(new Position("E", 1), king);
+      board.setPosition(new Position("A", 1), rook);
+      const validator = new KingMoveValidator(board, king);
+      const moves = validator.possibleMoves();
+      expect(moves).toContainEqual(new Position("C", 1));
     });
   });
 });

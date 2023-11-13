@@ -1,6 +1,6 @@
 import ChessBoard from "./board";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
-import Position, { PositionFile, PositionRank } from "./position";
+import Position, { PositionRank } from "./position";
 
 export type PieceToValidate = Pawn | Rook | Bishop | Knight | Queen | King;
 export abstract class MoveValidator<T extends PieceToValidate> {
@@ -210,14 +210,15 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
     const direction = rank > 0 ? 1 : -1;
     const currentFile = this.from.currentFile;
     const startRank = this.from.currentRank;
-    for (let i = 1; i < Math.abs(rank); i += 1) {
-      if (
-        this.board.getPieceFromPosition(
-          Position.from(currentFile, startRank + i * direction)
-        )
-      ) {
-        return false;
-      }
+    for (let i = 1; i <= Math.abs(rank); i += 1) {
+      const rankToCheck = startRank + i * direction;
+      const piece = this.board.getPieceFromPosition(
+        Position.from(currentFile, rankToCheck)
+      );
+      const onFinalRank = rankToCheck === to.currentRank;
+      if (piece?.pieceColor !== this.piece.pieceColor && onFinalRank)
+        return true;
+      if (piece) return false;
     }
     return true;
   }
@@ -270,24 +271,29 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
 export class KingMoveValidator extends MoveValidator<King> {
   public validateMove(): boolean {
     if (!super.validateMove()) return false;
+    if (this.isCastlingMove()) {
+      return this.validateCastlingMove();
+    }
     return true;
   }
   public possibleMoves(): Position[] {
     const moves: Position[] = [];
     const { currentRank, currentFile } = this.piece.currentPosition;
     for (let i = -1; i <= 1; i++) {
-      for (let j = -1; j <= 1; j++) {
+      for (let j = -2; j <= 2; j++) {
         if (i === 0 && j === 0) continue;
         const rank = (currentRank + i) as PositionRank;
         const file = ChessBoard.fileFromDistance(currentFile, j);
         if (!file || rank < 1 || rank > 8) continue;
-        this.potentialMove = new Position(file, rank);
-        if (this.validateMove()) moves.push(this.potentialMove);
+        this.to = new Position(file, rank);
+
+        if (this.validateMove()) moves.push(this.to);
       }
     }
+
     return moves;
   }
-  public isCastlingMove() {
+  public isCastlingMove(): boolean {
     if (!this.to) return false;
     const { file, rank } = this.from.distanceFrom(this.to);
     return Math.abs(file) === 2 && rank === 0;
@@ -302,19 +308,103 @@ export class KingMoveValidator extends MoveValidator<King> {
       new Position(rookFile, this.from.currentRank)
     ) as Rook;
     if (!rook || rook.hasMoved) return false;
-    let currentFile = this.piece.currentPosition.currentFile;
-    while (currentFile !== rook.currentPosition.currentFile) {
-      currentFile = ChessBoard.fileFromDistance(
-        currentFile,
-        1 * direction
-      ) as PositionFile;
-      const currentPosition = new Position(currentFile, this.from.currentRank);
+    // check two positions
+    for (let i = 1; i <= 2; i++) {
+      const fileToCheck = ChessBoard.fileFromDistance(
+        this.piece.currentPosition.currentFile,
+        i * direction
+      );
+
+      if (!fileToCheck) return false;
+      const positionToCheck = new Position(fileToCheck, this.from.currentRank);
       for (const piece of this.board.state.flat()) {
-        if (piece === null || piece.pieceColor === this.piece.pieceColor)
-          continue;
-        if (piece.canMoveTo(currentPosition)) return false;
+        if (!piece || piece.pieceColor === this.piece.pieceColor) continue;
+        const validator = ValidatorFactory.getValidator(
+          piece,
+          this.board,
+          positionToCheck
+        );
+
+        if (validator.validateMove()) {
+          return false;
+        }
       }
     }
+
     return true;
+  }
+}
+export class RookMoveValidator extends MoveValidator<Rook> {
+  private verticalValidator: VerticalMoveValidator;
+  private horizontalValidator: HorizontalMoveValidator;
+
+  constructor(board: ChessBoard, piece: Rook, to?: Position) {
+    super(board, piece, to);
+    this.verticalValidator = new VerticalMoveValidator(board, piece, to);
+    this.horizontalValidator = new HorizontalMoveValidator(board, piece, to);
+  }
+
+  public validateMove(): boolean {
+    return (
+      this.verticalValidator.validateMove() ||
+      this.horizontalValidator.validateMove()
+    );
+  }
+
+  public possibleMoves(): Position[] {
+    const verticalMoves = this.verticalValidator.possibleMoves();
+    const horizontalMoves = this.horizontalValidator.possibleMoves();
+    return [...verticalMoves, ...horizontalMoves];
+  }
+}
+
+export class QueenMoveValidator extends MoveValidator<Queen> {
+  private verticalValidator: VerticalMoveValidator;
+  private diagonalValidator: DiagonalMoveValidator;
+  private horizontalValidator: HorizontalMoveValidator;
+  constructor(board: ChessBoard, piece: Queen, to?: Position) {
+    super(board, piece, to);
+    this.verticalValidator = new VerticalMoveValidator(board, piece, to);
+    this.diagonalValidator = new DiagonalMoveValidator(board, piece, to);
+    this.horizontalValidator = new HorizontalMoveValidator(board, piece, to);
+  }
+
+  public validateMove(): boolean {
+    return (
+      this.verticalValidator.validateMove() ||
+      this.diagonalValidator.validateMove() ||
+      this.horizontalValidator.validateMove()
+    );
+  }
+
+  public possibleMoves(): Position[] {
+    const verticalMoves = this.verticalValidator.possibleMoves();
+    const diagonalMoves = this.diagonalValidator.possibleMoves();
+    const horizontalMoves = this.horizontalValidator.possibleMoves();
+    return [...verticalMoves, ...diagonalMoves, ...horizontalMoves];
+  }
+}
+
+class ValidatorFactory {
+  public static getValidator(
+    piece: PieceToValidate,
+    board: ChessBoard,
+    to?: Position
+  ): MoveValidator<PieceToValidate> {
+    if (piece.type === "pawn") {
+      return new PawnMoveValidator(board, piece as Pawn, to);
+    } else if (piece.type === "rook") {
+      return new RookMoveValidator(board, piece as Rook, to);
+    } else if (piece.type === "knight") {
+      return new KnightMoveValidator(board, piece as Knight, to);
+    } else if (piece.type === "bishop") {
+      return new DiagonalMoveValidator(board, piece as Bishop, to);
+    } else if (piece.type === "queen") {
+      return new QueenMoveValidator(board, piece as Queen, to); // Assuming you have a QueenMoveValidator
+    } else if (piece.type === "king") {
+      return new KingMoveValidator(board, piece as King, to);
+    } else {
+      throw new Error("Invalid piece type");
+    }
   }
 }

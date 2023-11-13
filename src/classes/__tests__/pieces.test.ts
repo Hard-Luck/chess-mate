@@ -199,11 +199,11 @@ describe("King", () => {
     expect(king.canMoveTo(move)).toBe(false);
 
     const secondKing = new King("white", "E", 4);
-    const secondMove = new Position("G", 4);
+    const secondMove = new Position("G", 6);
     expect(secondKing.canMoveTo(secondMove)).toBe(false);
 
     const thirdKing = new King("white", "E", 4);
-    const thirdMove = new Position("C", 3);
+    const thirdMove = new Position("C", 7);
     expect(thirdKing.canMoveTo(thirdMove)).toBe(false);
   });
 });
