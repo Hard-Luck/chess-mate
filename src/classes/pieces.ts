@@ -58,6 +58,7 @@ export class Pawn extends Piece {
 
 export class Rook extends Piece {
   type = "rook";
+  hasMoved = false;
   canMoveTo(position: Position) {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return rank === 0 || file === 0;
@@ -96,6 +97,7 @@ export class Queen extends Piece {
 export class King extends Piece {
   type = "king";
   checked = false;
+  hasMoved = false;
   canMoveTo(position: Position): boolean {
     const { rank, file } = this.currentPosition.distanceFrom(position);
     return Math.abs(rank) <= 1 && Math.abs(file) <= 1;

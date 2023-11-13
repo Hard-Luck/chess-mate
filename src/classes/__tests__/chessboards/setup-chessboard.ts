@@ -1,3 +1,4 @@
+import { Piece } from "@/classes/game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
 
 export const defaultSetUpBoard = [
@@ -48,6 +49,6 @@ export const defaultSetUpBoard = [
     new Rook("black", "H", 8),
   ],
 ];
-export const emptyChessBoard = Array.from({ length: 8 }, () =>
-  new Array(8).fill(null)
-);
+export function generateEmptyChessBoard() {
+  return Array.from({ length: 8 }, () => new Array(8).fill(null)) as Piece[][];
+}

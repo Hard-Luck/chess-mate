@@ -1,6 +1,6 @@
 import ChessBoard from "./board";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
-import Position, { PositionRank } from "./position";
+import Position, { PositionFile, PositionRank } from "./position";
 
 export type PieceToValidate = Pawn | Rook | Bishop | Knight | Queen | King;
 export abstract class MoveValidator<T extends PieceToValidate> {
@@ -286,5 +286,35 @@ export class KingMoveValidator extends MoveValidator<King> {
       }
     }
     return moves;
+  }
+  public isCastlingMove() {
+    if (!this.to) return false;
+    const { file, rank } = this.from.distanceFrom(this.to);
+    return Math.abs(file) === 2 && rank === 0;
+  }
+  public validateCastlingMove() {
+    if (this.piece.hasMoved || this.piece.checked) return false;
+    if (!this.to) return false;
+    const { file } = this.from.distanceFrom(this.to);
+    const rookFile = file === 2 ? "H" : "A";
+    const direction = file > 0 ? 1 : -1;
+    const rook = this.board.getPieceFromPosition(
+      new Position(rookFile, this.from.currentRank)
+    ) as Rook;
+    if (!rook || rook.hasMoved) return false;
+    let currentFile = this.piece.currentPosition.currentFile;
+    while (currentFile !== rook.currentPosition.currentFile) {
+      currentFile = ChessBoard.fileFromDistance(
+        currentFile,
+        1 * direction
+      ) as PositionFile;
+      const currentPosition = new Position(currentFile, this.from.currentRank);
+      for (const piece of this.board.state.flat()) {
+        if (piece === null || piece.pieceColor === this.piece.pieceColor)
+          continue;
+        if (piece.canMoveTo(currentPosition)) return false;
+      }
+    }
+    return true;
   }
 }

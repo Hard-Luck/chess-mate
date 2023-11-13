@@ -5,10 +5,10 @@ Interface to play chess built in typescript using react
 Still to do:
 
 - En Passant - Done
-- Available moves list - NEEDS REDO
-- Checks
+- Available moves list - Done
+- Checks - Done
 - Castling
-- Square Highlighting
+- Square Highlighting - Done (without castling)
 - Win conditions (checkmate/stalemate)
 - MORE TESTS
 - Notation Class

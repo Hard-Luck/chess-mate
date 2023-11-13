@@ -1,6 +1,7 @@
 import {
   DiagonalMoveValidator,
   HorizontalMoveValidator,
+  KingMoveValidator,
   PawnMoveValidator,
   VerticalMoveValidator,
 } from "../validators";
@@ -9,10 +10,12 @@ import { pieceIsBishop, pieceIsPawn, pieceIsRook } from "../utils";
 import { Bishop, King, Pawn, Queen, Rook } from "../pieces";
 import { Move } from "../game";
 import ChessBoard from "../board";
-import { emptyChessBoard } from "./chessboards/setup-chessboard";
+import { generateEmptyChessBoard } from "./chessboards/setup-chessboard";
 import Rules from "../rules";
 
-beforeEach(() => jest.resetModules());
+beforeEach(() => {
+  jest.resetModules();
+});
 describe("General", () => {
   test("shouldn't be able to move onto square with own piece on", () => {
     const board = new ChessBoard();
@@ -325,11 +328,96 @@ describe("special considerations", () => {
       expect(validator.validateMove()).toBe(true);
     });
   });
+  describe("castling", () => {
+    describe("isCastingMove", () => {
+      it("should return true when an attempted castling move is made", () => {
+        const emptyChessBoard = generateEmptyChessBoard();
+        const board = new ChessBoard(emptyChessBoard);
+        const king = new King("white", "E", 1);
+        const rook = new Rook("white", "A", 1);
+        board.setPosition(king.currentPosition, king);
+        board.setPosition(rook.currentPosition, rook);
+        const validator = new KingMoveValidator(
+          board,
+          king,
+          new Position("C", 1)
+        );
+        expect(validator.isCastlingMove()).toBe(true);
+      });
+      it("should return true when an attempted castling move is made", () => {
+        const emptyChessBoard = generateEmptyChessBoard();
+        const board = new ChessBoard(emptyChessBoard);
+        const king = new King("white", "E", 1);
+        const rook = new Rook("white", "A", 1);
+        board.setPosition(king.currentPosition, king);
+        board.setPosition(rook.currentPosition, rook);
+        const validator = new KingMoveValidator(
+          board,
+          king,
+          new Position("C", 1)
+        );
+        expect(validator.isCastlingMove()).toBe(true);
+      });
+    });
+    describe("validateCastlingMove", () => {
+      it("should return true when no pieces block the castling", () => {
+        const emptyChessBoard = generateEmptyChessBoard();
+        const board = new ChessBoard(emptyChessBoard);
+        const king = new King("white", "E", 1);
+        const rook = new Rook("white", "A", 1);
+        const opposingQueen = new Queen("black", "F", 8);
+        board.setPosition(king.currentPosition, king);
+        board.setPosition(rook.currentPosition, rook);
+        board.setPosition(opposingQueen.currentPosition, opposingQueen);
+        const validator = new KingMoveValidator(
+          board,
+          king,
+          new Position("C", 1)
+        );
+        expect(validator.validateCastlingMove()).toBe(true);
+      });
+      it("should return false when trying to pass through a check", () => {
+        const emptyChessBoard = generateEmptyChessBoard();
+
+        const board = new ChessBoard(emptyChessBoard);
+        const king = new King("white", "E", 1);
+        const rook = new Rook("white", "A", 1);
+        const opposingQueen = new Queen("black", "B", 8);
+        board.setPosition(king.currentPosition, king);
+        board.setPosition(rook.currentPosition, rook);
+        board.setPosition(opposingQueen.currentPosition, opposingQueen);
+        const validator = new KingMoveValidator(
+          board,
+          king,
+          new Position("C", 1)
+        );
+        expect(validator.validateCastlingMove()).toBe(false);
+      });
+      it("should return false when castling out of check", () => {
+        const emptyChessBoard = generateEmptyChessBoard();
+        const board = new ChessBoard(emptyChessBoard);
+        const king = new King("white", "E", 1);
+        const rook = new Rook("white", "A", 1);
+        const opposingQueen = new Queen("black", "E", 8);
+        board.setPosition(king.currentPosition, king);
+        board.setPosition(rook.currentPosition, rook);
+        board.setPosition(opposingQueen.currentPosition, opposingQueen);
+        king.checked = true;
+        const validator = new KingMoveValidator(
+          board,
+          king,
+          new Position("C", 1)
+        );
+        expect(validator.validateCastlingMove()).toBe(false);
+      });
+    });
+  });
 });
 
 describe("checks", () => {
   describe("inCheck", () => {
     it("should return true when king is in check", () => {
+      const emptyChessBoard = generateEmptyChessBoard();
       const board = new ChessBoard(emptyChessBoard);
       const rules = new Rules(board);
       const king = new King("white", "E", 1);
@@ -341,6 +429,8 @@ describe("checks", () => {
       expect(rules.inCheck("white")).toBe(true);
     });
     it("should return false when king is not in check  ", () => {
+      const emptyChessBoard = generateEmptyChessBoard();
+
       const board = new ChessBoard(emptyChessBoard);
       const rules = new Rules(board);
       const king = new King("white", "A", 1);
@@ -352,6 +442,8 @@ describe("checks", () => {
       expect(rules.inCheck("white")).toBe(false);
     });
     it("should return true when passed a position that would be in check", () => {
+      const emptyChessBoard = generateEmptyChessBoard();
+
       const board = new ChessBoard(emptyChessBoard);
       const rules = new Rules(board);
       const king = new King("black", "A", 8);
@@ -363,6 +455,8 @@ describe("checks", () => {
       expect(rules.inCheck("black", new Position("B", 8))).toBe(true);
     });
     it("should return false when a move wouldn't be in check", () => {
+      const emptyChessBoard = generateEmptyChessBoard();
+
       const board = new ChessBoard(emptyChessBoard);
       const rules = new Rules(board);
       const king = new King("black", "A", 8);
