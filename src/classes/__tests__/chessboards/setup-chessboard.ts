@@ -164,3 +164,23 @@ export const blockingCheckPosition = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, new King("white", "E", 8), null, null, null],
 ] as Board;
+
+export const castlingPosition = [
+  [
+    null,
+    null,
+    null,
+    null,
+    new King("white", "E", 1),
+    null,
+    null,
+    new Rook("white", "A", 1),
+  ],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, new King("black", "C", 8), null, null, null, null, null],
+];

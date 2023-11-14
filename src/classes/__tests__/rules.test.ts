@@ -297,15 +297,20 @@ describe("win conditions", () => {
     });
   });
   describe("checkmate", () => {
-    it("should return true when checkmate", () => {
+    it("should return true when checkmate - test case 1", () => {
       const position = checkMatePosition1;
       const board = new ChessBoard(position);
       const rules = new Rules(board);
       expect(rules.checkmate()).toBe(true);
     });
-    it("should return false when not checkmate", () => {
+    it("should return true when checkmate - test case 2", () => {
       const position = checkMatePosition2;
       const board = new ChessBoard(position);
+      const rules = new Rules(board);
+      expect(rules.checkmate()).toBe(true);
+    });
+    it("should return false when not a checkmate", () => {
+      const board = new ChessBoard();
       const rules = new Rules(board);
       expect(rules.checkmate()).toBe(false);
     });

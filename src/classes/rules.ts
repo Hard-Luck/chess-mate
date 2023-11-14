@@ -24,12 +24,20 @@ class Rules {
     }
     for (const piece of this.board.state.flat()) {
       if (!piece || piece.pieceColor === this.moves.playerTurnColor) continue;
-      console.log(this.possibleMovesFor(piece));
       if (this.possibleMovesFor(piece).length > 0) return false;
     }
     return true;
   }
   public checkmate(): boolean {
+    const opponentTurnColour = this.moves.opponentTurnColour;
+    if (!this.inCheck(opponentTurnColour)) {
+      return false;
+    }
+    for (const piece of this.board.state.flat()) {
+      if (!piece || piece.pieceColor === this.moves.playerTurnColor) continue;
+      console.log(this.possibleMovesFor(piece));
+      if (this.possibleMovesFor(piece).length > 0) return false;
+    }
     return true;
   }
   public isLegalCastleMove(from: Position, to: Position) {
