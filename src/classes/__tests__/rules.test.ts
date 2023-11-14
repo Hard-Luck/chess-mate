@@ -10,6 +10,7 @@ import { King, Pawn, Queen, Rook } from "../pieces";
 import { Move } from "../game";
 import ChessBoard from "../board";
 import {
+  blockingCheckPosition,
   checkMatePosition1,
   checkMatePosition2,
   exposingKingPosition,
@@ -259,8 +260,20 @@ describe("checks", () => {
       const badBishopMove = new Position("D", 2);
       expect(rules.wouldBeInCheck(bishopPosition, badBishopMove)).toBe(true);
     });
-    it.todo("should return false when a pice moves and blocks the check");
-    it.todo("should return false when a move would not be in check");
+    it("should return false when a pice moves and blocks the check", () => {
+      const board = new ChessBoard(blockingCheckPosition);
+      const rules = new Rules(board);
+      const bishopPosition = new Position("D", 2);
+      const blockingMove = new Position("C", 1);
+      expect(rules.wouldBeInCheck(bishopPosition, blockingMove)).toBe(false);
+    });
+    it("should return false when a move would not be in check", () => {
+      const board = new ChessBoard();
+      const rules = new Rules(board);
+      const pawnPosition = new Position("A", 2);
+      const nonCheckingMove = new Position("A", 4);
+      expect(rules.wouldBeInCheck(pawnPosition, nonCheckingMove)).toBe(false);
+    });
   });
 });
 describe("win conditions", () => {

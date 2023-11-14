@@ -145,3 +145,22 @@ export const exposingKingPosition = [
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, new King("white", "E", 8), null, null, null],
 ] as Board;
+export const blockingCheckPosition = [
+  [
+    new King("black", "A", 1),
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Queen("white", "G", 1),
+    null,
+  ],
+  [null, null, null, new Bishop("black", "D", 2), null, null, null, null],
+  [null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, new King("white", "E", 8), null, null, null],
+] as Board;
