@@ -19,9 +19,6 @@ export default class Game {
   get state() {
     return this.chessBoard.state;
   }
-  public getPieceAtPosition(position: Position): Piece {
-    return this.chessBoard.getPieceFromPosition(position);
-  }
   get turnNumber() {
     return this.rules.moves.turnNumber;
   }
@@ -29,7 +26,10 @@ export default class Game {
     return this.rules.moves.playerTurnColor;
   }
   public possibleMovesFor(piece: Piece): Position[] {
-    return this.rules.possibleMovesFor(piece)!;
+    return this.rules.possibleMovesFor(piece);
+  }
+  public getPieceAtPosition(position: Position): Piece {
+    return this.chessBoard.getPieceFromPosition(position);
   }
   public makeMove(from: Position, to: Position): Board {
     if (this.rules.isLegalCastleMove(from, to)) {

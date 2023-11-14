@@ -35,7 +35,6 @@ class Rules {
     }
     for (const piece of this.board.state.flat()) {
       if (!piece || piece.pieceColor === this.moves.playerTurnColor) continue;
-      console.log(this.possibleMovesFor(piece));
       if (this.possibleMovesFor(piece).length > 0) return false;
     }
     return true;
@@ -44,7 +43,7 @@ class Rules {
     const piece = this.board.getPieceFromPosition(from);
     if (!pieceIsKing(piece)) return false;
     const validator = new KingMoveValidator(this.board, piece, to);
-    return validator.isCastlingMove();
+    return validator.validateCastlingMove();
   }
   public isLegalEnPassantMove(from: Position, to: Position) {
     const piece = this.board.getPieceFromPosition(from);

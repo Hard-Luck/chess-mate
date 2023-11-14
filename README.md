@@ -9,7 +9,9 @@ Still to do:
 - Checks - Done
 - Castling - Done
 - Square Highlighting - Done
-- Win conditions (checkmate/stalemate)
+- Win conditions (checkmate/stalemate) - Done
+- check that you cant castle when either piece has moved
+- Game tests - WIP
 - Notation Class
 - Previous moves list (display)
 - export games
