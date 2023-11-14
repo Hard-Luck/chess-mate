@@ -23,6 +23,9 @@ export default class Moves {
   get playerTurnColor() {
     return this.playerTurn;
   }
+  get opponentTurnColour() {
+    return this.playerTurn === "white" ? "black" : "white";
+  }
   public nextTurn() {
     this.turn++;
   }

@@ -57,7 +57,7 @@ export function generateEmptyChessBoard() {
 export const staleMatePosition1 = [
   [null, null, null, null, null, null, null, new King("black", "H", 1)],
   [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, new Queen("white", "G", 6), null],
+  [null, null, null, null, null, null, new Queen("white", "G", 3), null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
@@ -67,13 +67,13 @@ export const staleMatePosition1 = [
 
 export const staleMatePosition2 = [
   [new King("black", "A", 1), null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, new Rook("white", "B", 7), null],
+  [null, null, null, null, null, null, new Rook("white", "G", 2), null],
   [null, null, null, null, null, null, null],
   [null, new Queen("white", "B", 4), null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
   [null, null, null, null, null, null, null, null],
-  [null, null, null, null, new King("white", "E", 1), null, null, null],
+  [null, null, null, null, new King("white", "E", 8), null, null, null],
 ] as Board;
 export const checkMatePosition1 = [
   [

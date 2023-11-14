@@ -1,4 +1,5 @@
 import ChessBoard from "./board";
+import { Move } from "./game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionRank } from "./position";
 
@@ -205,8 +206,6 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
     if (!super.validateMove()) return false;
     const to = this.to || this.potentialMove;
     if (!to) return false;
-    console.log(to);
-
     const { rank, file } = this.from.distanceFrom(to);
     if (file !== 0) return false;
     const direction = rank > 0 ? 1 : -1;
@@ -388,9 +387,6 @@ export class QueenMoveValidator extends MoveValidator<Queen> {
   }
 
   public validateMove(): boolean {
-    console.log(this.verticalValidator.validateMove(), "vertical");
-    console.log(this.diagonalValidator.validateMove(), "diagonal");
-    console.log(this.horizontalValidator.validateMove(), "horizontal");
     return (
       this.verticalValidator.validateMove() ||
       this.diagonalValidator.validateMove() ||
@@ -410,10 +406,11 @@ export class ValidatorFactory {
   public static getValidator(
     piece: PieceToValidate,
     board: ChessBoard,
-    to?: Position
+    to?: Position,
+    lastMove?: Move
   ): MoveValidator<PieceToValidate> {
     if (piece.type === "pawn") {
-      return new PawnMoveValidator(board, piece as Pawn, to);
+      return new PawnMoveValidator(board, piece as Pawn, to, lastMove);
     } else if (piece.type === "rook") {
       return new RookMoveValidator(board, piece as Rook, to);
     } else if (piece.type === "knight") {
