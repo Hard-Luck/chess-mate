@@ -100,6 +100,8 @@ export class King extends Piece {
   hasMoved = false;
   canMoveTo(position: Position): boolean {
     const { rank, file } = this.currentPosition.distanceFrom(position);
-    return Math.abs(rank) <= 1 && Math.abs(file) <= 2;
+    if (Math.abs(rank) <= 1 && Math.abs(file) <= 1) return true;
+    if (rank === 0 && Math.abs(file) === 2) return true;
+    return false;
   }
 }

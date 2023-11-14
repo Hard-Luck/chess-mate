@@ -299,6 +299,7 @@ export class KingMoveValidator extends MoveValidator<King> {
     for (let i = -1; i <= 1; i++) {
       for (let j = -2; j <= 2; j++) {
         if (i === 0 && j === 0) continue;
+        if (i !== 0 && Math.abs(j) === 2) continue;
         const rank = (currentRank + i) as PositionRank;
         const file = ChessBoard.fileFromDistance(currentFile, j);
         if (!file || rank < 1 || rank > 8) continue;
@@ -318,15 +319,15 @@ export class KingMoveValidator extends MoveValidator<King> {
   public validateCastlingMove() {
     if (this.piece.hasMoved || this.piece.checked) return false;
     if (!super.validateMove()) return false;
-    console.log("HEREs");
     if (!this.to) return false;
-    const { file } = this.from.distanceFrom(this.to);
+    const { file, rank } = this.from.distanceFrom(this.to);
+    if (rank !== 0) return false;
     const rookFile = file === 2 ? "H" : "A";
     const direction = file > 0 ? 1 : -1;
     const rook = this.board.getPieceFromPosition(
       new Position(rookFile, this.from.currentRank)
     ) as Rook;
-    if (!rook || rook.hasMoved) return false;
+    if (!rook || rook.type !== "rook" || rook.hasMoved) return false;
     for (let i = 1; i <= 2; i++) {
       const fileToCheck = ChessBoard.fileFromDistance(
         this.piece.currentPosition.currentFile,

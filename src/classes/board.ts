@@ -1,6 +1,7 @@
 import { Board, Piece } from "./game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "./pieces";
 import Position, { PositionFile } from "./position";
+import { pieceIsKing, pieceIsRook } from "./utils";
 
 export default class ChessBoard {
   private board: Board;
@@ -85,6 +86,9 @@ export default class ChessBoard {
     }
     this.setPosition(to, piece);
     piece.currentPosition = to;
+    if (pieceIsKing(piece) || pieceIsRook(piece)) {
+      piece.hasMoved = true;
+    }
   }
   public kingLocation(color: "white" | "black") {
     const king = this.state
