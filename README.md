@@ -7,10 +7,9 @@ Still to do:
 - En Passant - Done
 - Available moves list - Done
 - Checks - Done
-- Castling
-- Square Highlighting - Done (without castling)
+- Castling - Done
+- Square Highlighting - Done
 - Win conditions (checkmate/stalemate)
-- MORE TESTS
 - Notation Class
 - Previous moves list (display)
 - export games

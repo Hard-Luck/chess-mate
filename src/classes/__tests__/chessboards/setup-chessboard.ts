@@ -1,4 +1,4 @@
-import { Piece } from "@/classes/game";
+import { Board } from "@/classes/game";
 import { Bishop, King, Knight, Pawn, Queen, Rook } from "@/classes/pieces";
 
 export const defaultSetUpBoard = [
@@ -48,7 +48,100 @@ export const defaultSetUpBoard = [
     new Knight("black", "G", 8),
     new Rook("black", "H", 8),
   ],
-];
+] as Board;
+
 export function generateEmptyChessBoard() {
-  return Array.from({ length: 8 }, () => new Array(8).fill(null)) as Piece[][];
+  return Array.from({ length: 8 }, () => new Array(8).fill(null)) as Board;
 }
+
+export const staleMatePosition1 = [
+  [null, null, null, null, null, null, null, new King("black", "H", 1)],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, new Queen("white", "G", 6), null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, new King("white", "E", 8), null, null, null],
+] as Board;
+
+export const staleMatePosition2 = [
+  [new King("black", "A", 1), null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, new Rook("white", "B", 7), null],
+  [null, null, null, null, null, null, null],
+  [null, new Queen("white", "B", 4), null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, new King("white", "E", 1), null, null, null],
+] as Board;
+export const checkMatePosition1 = [
+  [
+    new King("black", "A", 1),
+    null,
+    null,
+    null,
+    null,
+    null,
+    new Queen("white", "G", 1),
+    null,
+  ],
+  [null, null, null, null, null, null, new Rook("white", "G", 2), null],
+  [null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, new King("white", "E", 8), null, null, null],
+] as Board;
+
+export const checkMatePosition2 = [
+  [
+    new King("black", "A", 1),
+    null,
+    new King("white", "C", 1),
+    null,
+    null,
+    null,
+    null,
+    null,
+  ],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null],
+  [new Queen("white", "A", 4), null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+] as Board;
+
+export const queenOnBFile = [
+  [new King("black", "A", 1), null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null],
+  [null, new Queen("white", "B", 4), null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+] as Board;
+
+export const exposingKingPosition = [
+  [
+    new King("black", "A", 1),
+    null,
+    new Bishop("black", "C", 1),
+    null,
+    null,
+    null,
+    new Queen("white", "G", 1),
+    null,
+  ],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, new King("white", "E", 8), null, null, null],
+] as Board;

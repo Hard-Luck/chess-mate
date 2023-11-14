@@ -205,21 +205,29 @@ export class VerticalMoveValidator extends MoveValidator<Rook | Queen> {
     if (!super.validateMove()) return false;
     const to = this.to || this.potentialMove;
     if (!to) return false;
+    console.log(to);
+
     const { rank, file } = this.from.distanceFrom(to);
     if (file !== 0) return false;
     const direction = rank > 0 ? 1 : -1;
     const currentFile = this.from.currentFile;
-    const startRank = this.from.currentRank;
-    for (let i = 1; i <= Math.abs(rank); i += 1) {
-      const rankToCheck = startRank + i * direction;
-      const piece = this.board.getPieceFromPosition(
-        Position.from(currentFile, rankToCheck)
+    const startRank = this.piece.currentPosition.currentRank;
+
+    for (let i = 1; i < Math.abs(rank); i++) {
+      const rankToCheck = (startRank + i * direction) as PositionRank;
+      const pieceOnSquare = this.board.getPieceFromPosition(
+        new Position(currentFile, rankToCheck)
       );
-      const onFinalRank = rankToCheck === to.currentRank;
-      if (piece?.pieceColor !== this.piece.pieceColor && onFinalRank)
-        return true;
-      if (piece) return false;
+      if (pieceOnSquare) return false;
     }
+    const pieceOnDestination = this.board.getPieceFromPosition(to);
+    if (
+      pieceOnDestination &&
+      pieceOnDestination.pieceColor === this.piece.pieceColor
+    ) {
+      return false;
+    }
+
     return true;
   }
   public possibleMoves(): Position[] {
@@ -241,19 +249,29 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
     const to = this.to || this.potentialMove;
     if (!to) return false;
     const { file, rank } = this.from.distanceFrom(to);
-    if (rank !== 0) return false;
+    if (rank !== 0) return false; // Ensure move is horizontal
     const direction = file > 0 ? 1 : -1;
+    const startFile = this.from.currentFile;
+    const currentRank = this.from.currentRank;
+
     for (let i = 1; i < Math.abs(file); i++) {
-      const fileToCheck = ChessBoard.fileFromDistance(
-        this.from.currentFile,
-        i * direction
-      );
+      const fileToCheck = ChessBoard.fileFromDistance(startFile, i * direction);
       if (!fileToCheck) return false;
-      const current = Position.from(fileToCheck, this.from.currentRank);
-      if (this.board.getPieceFromPosition(current)) {
-        return false;
-      }
+      const pieceOnSquare = this.board.getPieceFromPosition(
+        new Position(fileToCheck, currentRank)
+      );
+      if (pieceOnSquare) return false; // Block if there's a piece in between
     }
+
+    // Check the square at the destination
+    const pieceOnDestination = this.board.getPieceFromPosition(to);
+    if (
+      pieceOnDestination &&
+      pieceOnDestination.pieceColor === this.piece.pieceColor
+    ) {
+      return false; // Block if destination has a piece of the same color
+    }
+
     return true;
   }
   public possibleMoves(): Position[] {
@@ -370,6 +388,9 @@ export class QueenMoveValidator extends MoveValidator<Queen> {
   }
 
   public validateMove(): boolean {
+    console.log(this.verticalValidator.validateMove(), "vertical");
+    console.log(this.diagonalValidator.validateMove(), "diagonal");
+    console.log(this.horizontalValidator.validateMove(), "horizontal");
     return (
       this.verticalValidator.validateMove() ||
       this.diagonalValidator.validateMove() ||
@@ -385,7 +406,7 @@ export class QueenMoveValidator extends MoveValidator<Queen> {
   }
 }
 
-class ValidatorFactory {
+export class ValidatorFactory {
   public static getValidator(
     piece: PieceToValidate,
     board: ChessBoard,

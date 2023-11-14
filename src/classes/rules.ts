@@ -16,6 +16,7 @@ import {
   KingMoveValidator,
   KnightMoveValidator,
   PawnMoveValidator,
+  ValidatorFactory,
   VerticalMoveValidator,
 } from "./validators";
 
@@ -25,6 +26,12 @@ class Rules {
   constructor(board: ChessBoard) {
     this.moves = new Moves();
     this.board = board;
+  }
+  public stalemate(): boolean {
+    return true;
+  }
+  public checkmate(): boolean {
+    return true;
   }
   public isLegalCastleMove(from: Position, to: Position) {
     const piece = this.board.getPieceFromPosition(from);
@@ -117,56 +124,43 @@ class Rules {
     return false;
   }
   public possibleMovesFor(piece: Piece): Position[] {
-    if (pieceIsPawn(piece)) {
-      const validator = new PawnMoveValidator(
-        this.board,
-        piece,
-        undefined,
-        this.moves.previousMove
-      );
-      return validator.possibleMoves();
-    }
-    if (pieceIsKnight(piece)) {
-      const validator = new KnightMoveValidator(this.board, piece);
-      return validator.possibleMoves();
-    }
-    if (pieceIsBishop(piece)) {
-      const validator = new DiagonalMoveValidator(this.board, piece);
-      return validator.possibleMoves();
-    }
-    if (pieceIsRook(piece)) {
-      const verticalValidator = new VerticalMoveValidator(this.board, piece);
-      const horizontalValidator = new HorizontalMoveValidator(
-        this.board,
-        piece
-      );
-      const verticalMoves = verticalValidator.possibleMoves();
-      const horizontalMoves = horizontalValidator.possibleMoves();
-      return [...verticalMoves, ...horizontalMoves];
-    }
-    if (pieceIsQueen(piece)) {
-      const verticalValidator = new VerticalMoveValidator(this.board, piece);
-      const horizontalValidator = new HorizontalMoveValidator(
-        this.board,
-        piece
-      );
-      const diagonalValidator = new DiagonalMoveValidator(this.board, piece);
-      const verticalMoves = verticalValidator.possibleMoves();
-      const horizontalMoves = horizontalValidator.possibleMoves();
-      const diagonalMoves = diagonalValidator.possibleMoves();
-      return [...verticalMoves, ...horizontalMoves, ...diagonalMoves];
-    }
-    if (pieceIsKing(piece)) {
-      const validator = new KingMoveValidator(this.board, piece);
-      return validator.possibleMoves();
-    }
-    throw new Error("Invalid piece");
+    if (!piece) throw new Error("Invalid piece");
+    const validator = ValidatorFactory.getValidator(piece, this.board);
+    return validator.possibleMoves();
   }
   public inCheck(color: "white" | "black", kingPosition?: Position) {
     kingPosition ??= this.board.kingLocation(color);
+    return this.squareUnderAttack(color, kingPosition);
+  }
+  public wouldBeInCheck(from: Position, to: Position): boolean {
+    const piece = this.board.getPieceFromPosition(from);
+    const pieceOnTo = this.board.getPieceFromPosition(to);
+
+    if (!piece) return false;
+    this.board.setPosition(from, null);
+    this.board.setPosition(to, piece);
+    piece.currentPosition = to;
+    const kingColor = piece.pieceColor;
+    const kingPosition = this.board.kingLocation(kingColor);
+    const attacked = this.squareUnderAttack(kingColor, kingPosition);
+    this.board.setPosition(from, piece);
+    this.board.setPosition(to, pieceOnTo);
+    piece.currentPosition = from;
+    return attacked;
+  }
+  private squareUnderAttack(
+    color: "white" | "black",
+    square: Position
+  ): boolean {
     for (const piece of this.board.state.flat()) {
       if (piece === null || piece.pieceColor === color) continue;
-      if (piece.canMoveTo(kingPosition)) return true;
+      const validator = ValidatorFactory.getValidator(
+        piece,
+        this.board,
+        square
+      );
+      console.log(piece);
+      if (validator.validateMove()) return true;
     }
     return false;
   }
