@@ -1,7 +1,7 @@
-import Board from "@/components/Board";
+import PracticeBoard from "@/components/PracticeBoard";
 
 function Practice() {
-  return <Board />;
+  return <PracticeBoard />;
 }
 
 export default Practice;

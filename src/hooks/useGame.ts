@@ -1,8 +1,16 @@
 import Game from "@/classes/game";
-import Position from "@/classes/position";
+import Position, { PositionFile, PositionRank } from "@/classes/position";
 import { useState } from "react";
-
-function useGame() {
+type socketMove = {
+  toFile: PositionFile;
+  toRank: PositionRank;
+  fromFile: PositionFile;
+  fromRank: PositionRank;
+};
+function useGame(
+  playerColour: "white" | "black" | null,
+  onMove: (move: socketMove) => void
+) {
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
@@ -17,6 +25,7 @@ function useGame() {
     setSelectedSquare(null);
   }
   function selectSquare(e: React.MouseEvent) {
+    if (game.turnColor !== playerColour) return;
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
     const position = Position.from(square[0], square[1]);
@@ -37,17 +46,26 @@ function useGame() {
         setPossibleMoves(movesIndexes);
       }
     } else {
-      try {
-        const newBoard = game.makeMove(selectedSquare, position);
-        setSelectedSquare(null);
-        setBoard(newBoard);
-        setPossibleMoves({});
-      } catch (err) {
-        setSelectedSquare(null);
-        setPossibleMoves({});
-      }
+      makeMove(selectedSquare, position);
+      onMove({
+        toFile: position.currentFile,
+        toRank: position.currentRank,
+        fromFile: selectedSquare.currentFile,
+        fromRank: selectedSquare.currentRank,
+      });
     }
   }
-  return { board, resetGame, selectSquare, turnColor, possibleMoves };
+  function makeMove(to: Position, from: Position) {
+    try {
+      const newBoard = game.makeMove(to, from);
+      setSelectedSquare(null);
+      setBoard(newBoard);
+      setPossibleMoves({});
+    } catch (err) {
+      setSelectedSquare(null);
+      setPossibleMoves({});
+    }
+  }
+  return { board, resetGame, selectSquare, turnColor, possibleMoves, makeMove };
 }
 export default useGame;
