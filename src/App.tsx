@@ -7,8 +7,8 @@ function App() {
   return (
     <SocketProvider>
       <Routes>
-        <Route path="/" element={<Practice />} />
-        <Route path="/challenge" element={<Multiplayer />} />
+        <Route path="/practice" element={<Practice />} />
+        <Route path="/" element={<Multiplayer />} />
         <Route path="*" element={<h1>404</h1>} />
       </Routes>
     </SocketProvider>
