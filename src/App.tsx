@@ -2,7 +2,7 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Practice from "./pages/Practice";
 import Multiplayer from "./pages/Multiplayer";
-import { SocketProvider } from "./hooks/useSocket";
+import { SocketProvider } from "./contexts/SocketProvider";
 function App() {
   return (
     <SocketProvider>

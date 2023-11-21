@@ -70,7 +70,7 @@ function Multiplayer() {
         }
       }
     };
-  }, [roomId]);
+  }, [roomId, makeMove, socket]);
   function sendMove(move: {
     toFile: PositionFile;
     toRank: PositionRank;

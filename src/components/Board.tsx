@@ -15,8 +15,10 @@ export default function Board({
     fromRank: PositionRank;
   }) => void;
 }) {
-  const { board, resetGame, selectSquare, turnColor, possibleMoves, makeMove } =
-    useGame(playerColour, onMove);
+  const { board, resetGame, selectSquare, turnColor, possibleMoves } = useGame(
+    playerColour,
+    onMove
+  );
   const [size, setSize] = useState(
     Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
   );
