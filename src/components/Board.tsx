@@ -8,7 +8,7 @@ import { useSearchParams } from "react-router-dom";
 export default function Board() {
   const [params] = useSearchParams();
   const roomId = params.get("roomId");
-  const { socket, sendMove } = useSocket();
+  const { socket } = useSocket();
   const {
     board,
     resetGame,
@@ -41,24 +41,18 @@ export default function Board() {
               message.playerColour === "black" ? "white" : "black"
             );
           }
-          if (message.move) {
+          if (message.move && message.playerColour !== playerColor) {
             const from = Position.from(
               message.move.fromFile,
               message.move.fromRank
             );
             const to = Position.from(message.move.toFile, message.move.toRank);
             makeMove(from, to);
-            sendMove(roomId, {
-              toFile: to.currentFile,
-              toRank: to.currentRank,
-              fromFile: from.currentFile,
-              fromRank: from.currentRank,
-            });
           }
         }
       );
     }
-  });
+  }, [socket, makeMove, playerColor, roomId, setPlayerColor]);
 
   useEffect(() => {
     const handleResize = () => {

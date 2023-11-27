@@ -2,8 +2,19 @@ import React, { useState, PropsWithChildren } from "react";
 import Game from "@/classes/game";
 import Position from "@/classes/position";
 import GameContext from "./GameContext"; // Path to your GameContext
-
+import { useSearchParams } from "react-router-dom";
+import { useSocket } from "@/hooks/useSocket";
+import { PositionFile, PositionRank } from "@/classes/position";
+type MoveType = {
+  toFile: PositionFile;
+  toRank: PositionRank;
+  fromFile: PositionFile;
+  fromRank: PositionRank;
+};
 const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const [params] = useSearchParams();
+  const { socket } = useSocket();
+  const roomId = params.get("roomId");
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
@@ -14,7 +25,16 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     "white"
   );
   const turnColor = game.turnColor;
-
+  function startGame() {
+    if (socket && roomId) {
+      const color = Math.random() < 0.5 ? "white" : "black";
+      socket.emit("sendMessageToRoom", {
+        roomId,
+        message: { newGame: true, playerColour: color },
+      });
+      setPlayerColor(color);
+    }
+  }
   // Reset game function
   const resetGame = () => {
     const newGame = new Game();
@@ -22,7 +42,15 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setGame(() => newGame);
     setSelectedSquare(null);
   };
-
+  function sendMove(roomId: string, move: MoveType) {
+    if (!socket) return;
+    if (!roomId) return;
+    socket.emit("sendMessageToRoom", {
+      newGame: false,
+      roomId,
+      message: { move },
+    });
+  }
   function selectSquare(e: React.MouseEvent) {
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
@@ -44,12 +72,21 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
         setPossibleMoves(movesIndexes);
       }
     } else {
-      makeMove(selectedSquare, position);
+      makeMoveAndBroadcast(selectedSquare, position);
     }
   }
-  function makeMove(to: Position, from: Position) {
+  function makeMoveAndBroadcast(from: Position, to: Position) {
+    sendMove(roomId!, {
+      toFile: to.currentFile,
+      toRank: to.currentRank,
+      fromFile: from.currentFile,
+      fromRank: from.currentRank,
+    });
+    makeMove(from, to);
+  }
+  const makeMove = (from: Position, to: Position) => {
     try {
-      const newBoard = game.makeMove(to, from);
+      const newBoard = game.makeMove(from, to);
       setSelectedSquare(null);
       setBoard(newBoard);
       setPossibleMoves({});
@@ -57,7 +94,7 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setSelectedSquare(null);
       setPossibleMoves({});
     }
-  }
+  };
 
   // Context value that will be provided to the children
   const contextValue = {
@@ -75,6 +112,7 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     makeMove,
     playerColor,
     setPlayerColor,
+    startGame,
   };
 
   return (

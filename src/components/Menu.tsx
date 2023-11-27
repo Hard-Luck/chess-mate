@@ -3,25 +3,33 @@ import { useGame } from "@/hooks/useGame";
 import { useSocket } from "@/hooks/useSocket";
 import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import ThemeDropDown from "./ThemeDropDown";
 
 export default function Menu() {
   const { socket, joinRoom } = useSocket();
   const { setPlayerColor } = useGame();
   const [params, setParams] = useSearchParams();
-  let roomId = params.get("roomId");
+  const roomId = params.get("roomId");
 
   useEffect(() => {
     if (!roomId) {
       const newRoomId = uuidv4();
       setParams({ roomId: newRoomId });
-      roomId = newRoomId;
     }
-    joinRoom(roomId);
   }, [roomId, setParams]);
+  useEffect(() => {
+    if (socket && roomId) {
+      joinRoom(roomId);
+    }
+    return () => {
+      if (socket) {
+        socket.emit("leaveRoom", roomId);
+      }
+    };
+  }, [roomId, socket, joinRoom]);
 
   function startGame() {
     if (socket && roomId) {
-      console.log(roomId);
       const color = Math.random() < 0.5 ? "white" : "black";
       socket.emit("sendMessageToRoom", {
         roomId,
@@ -37,6 +45,7 @@ export default function Menu() {
       <div className="bg-green-500">
         <button onClick={startGame}>start game</button>
       </div>
+      <ThemeDropDown />
     </div>
   );
 }

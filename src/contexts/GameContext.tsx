@@ -20,6 +20,7 @@ type GameContextType = {
   turnColor: "white" | "black" | null;
   resetGame: () => void;
   makeMove: (to: Position, from: Position) => void;
+  startGame: () => void;
 };
 
 const GameContext = React.createContext<GameContextType | null>(null);

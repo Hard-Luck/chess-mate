@@ -4,10 +4,12 @@ import { SocketContext, SocketContextType } from "./SocketContext";
 
 export const SocketProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [socket, setSocket] = useState<SocketContextType>(null);
-
   useEffect(() => {
-    const newSocket = io("https://chess-mate-server.onrender.com");
+    const newSocket = io("http://localhost:3000");
     setSocket(newSocket);
+    newSocket.on("connect", () => {
+      console.log("connected");
+    });
 
     return () => {
       newSocket.close();
