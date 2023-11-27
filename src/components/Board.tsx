@@ -1,27 +1,65 @@
-import { PositionFile, PositionRank } from "@/classes/position";
-import useGame from "@/hooks/useGame";
+import Position, { PositionFile, PositionRank } from "@/classes/position";
+import { useGame } from "@/hooks/useGame";
 import { useEffect, useState } from "react";
 import Square from "./Square";
+import { useSocket } from "@/hooks/useSocket";
+import { useSearchParams } from "react-router-dom";
 
-export default function Board({
-  playerColour,
-  onMove,
-}: {
-  playerColour: "white" | "black" | null;
-  onMove: (move: {
-    toFile: PositionFile;
-    toRank: PositionRank;
-    fromFile: PositionFile;
-    fromRank: PositionRank;
-  }) => void;
-}) {
-  const { board, resetGame, selectSquare, turnColor, possibleMoves } = useGame(
-    playerColour,
-    onMove
-  );
+export default function Board() {
+  const [params] = useSearchParams();
+  const roomId = params.get("roomId");
+  const { socket, sendMove } = useSocket();
+  const {
+    board,
+    resetGame,
+    selectSquare,
+    turnColor,
+    possibleMoves,
+    playerColor,
+    setPlayerColor,
+    makeMove,
+  } = useGame();
   const [size, setSize] = useState(
     Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
   );
+  useEffect(() => {
+    if (roomId && socket) {
+      socket.on(
+        "message",
+        (message: {
+          newGame: boolean;
+          playerColour: "white" | "black";
+          move?: {
+            toFile: PositionFile;
+            toRank: PositionRank;
+            fromFile: PositionFile;
+            fromRank: PositionRank;
+          };
+        }) => {
+          if (message.newGame) {
+            setPlayerColor(
+              message.playerColour === "black" ? "white" : "black"
+            );
+          }
+          if (message.move) {
+            const from = Position.from(
+              message.move.fromFile,
+              message.move.fromRank
+            );
+            const to = Position.from(message.move.toFile, message.move.toRank);
+            makeMove(from, to);
+            sendMove(roomId, {
+              toFile: to.currentFile,
+              toRank: to.currentRank,
+              fromFile: from.currentFile,
+              fromRank: from.currentRank,
+            });
+          }
+        }
+      );
+    }
+  });
+
   useEffect(() => {
     const handleResize = () => {
       const newSize = Math.min(
@@ -36,7 +74,7 @@ export default function Board({
 
   const boardSize = size * 8;
   const boardView = board.slice();
-  if (playerColour !== "black") boardView.reverse();
+  if (playerColor !== "black") boardView.reverse();
   return (
     <>
       <div
@@ -47,7 +85,7 @@ export default function Board({
           const whiteView = rank.map((piece, j) => {
             const file = String.fromCharCode(j + 65) as PositionFile;
             const rank =
-              playerColour === "white"
+              playerColor === "white"
                 ? ((8 - i) as PositionRank)
                 : ((i + 1) as PositionRank);
             return (
@@ -61,7 +99,7 @@ export default function Board({
               />
             );
           });
-          if (playerColour !== "white") whiteView.reverse();
+          if (playerColor !== "white") whiteView.reverse();
           return whiteView;
         })}
       </div>

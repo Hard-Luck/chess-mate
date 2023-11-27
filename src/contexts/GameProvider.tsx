@@ -1,31 +1,29 @@
+import React, { useState, PropsWithChildren } from "react";
 import Game from "@/classes/game";
-import Position, { PositionFile, PositionRank } from "@/classes/position";
-import { useState } from "react";
-type socketMove = {
-  toFile: PositionFile;
-  toRank: PositionRank;
-  fromFile: PositionFile;
-  fromRank: PositionRank;
-};
-function useGame(
-  playerColour: "white" | "black" | null,
-  onMove: (move: socketMove) => void
-) {
+import Position from "@/classes/position";
+import GameContext from "./GameContext"; // Path to your GameContext
+
+const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [game, setGame] = useState(new Game());
   const [board, setBoard] = useState(game.state);
   const [selectedSquare, setSelectedSquare] = useState<Position | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<Record<string, boolean>>(
     {}
   );
+  const [playerColor, setPlayerColor] = useState<"white" | "black" | null>(
+    "white"
+  );
   const turnColor = game.turnColor;
-  function resetGame() {
+
+  // Reset game function
+  const resetGame = () => {
     const newGame = new Game();
     setBoard(() => newGame.state);
     setGame(() => newGame);
     setSelectedSquare(null);
-  }
+  };
+
   function selectSquare(e: React.MouseEvent) {
-    if (game.turnColor !== playerColour) return;
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
     const position = Position.from(square[0], square[1]);
@@ -47,12 +45,6 @@ function useGame(
       }
     } else {
       makeMove(selectedSquare, position);
-      onMove({
-        toFile: position.currentFile,
-        toRank: position.currentRank,
-        fromFile: selectedSquare.currentFile,
-        fromRank: selectedSquare.currentRank,
-      });
     }
   }
   function makeMove(to: Position, from: Position) {
@@ -66,6 +58,28 @@ function useGame(
       setPossibleMoves({});
     }
   }
-  return { board, resetGame, selectSquare, turnColor, possibleMoves, makeMove };
-}
-export default useGame;
+
+  // Context value that will be provided to the children
+  const contextValue = {
+    game,
+    setGame,
+    board,
+    setBoard,
+    selectSquare,
+    selectedSquare,
+    setSelectedSquare,
+    possibleMoves,
+    setPossibleMoves,
+    turnColor,
+    resetGame,
+    makeMove,
+    playerColor,
+    setPlayerColor,
+  };
+
+  return (
+    <GameContext.Provider value={contextValue}>{children}</GameContext.Provider>
+  );
+};
+
+export default GameProvider;

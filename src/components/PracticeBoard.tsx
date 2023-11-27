@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import type { PositionFile, PositionRank } from "../classes/position";
 import Square from "./Square";
-import useGame from "@/hooks/useGame";
+import { useGame } from "@/hooks/useGame";
 
 function PracticeBoard() {
-  const { board, resetGame, selectSquare, turnColor, possibleMoves } = useGame(
-    null,
-    () => {}
-  );
+  const { board, resetGame, selectSquare, turnColor, possibleMoves } =
+    useGame();
   const [size, setSize] = useState(
     Math.min(window.innerWidth * 0.1, window.innerHeight * 0.1)
   );
