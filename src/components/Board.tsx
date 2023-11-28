@@ -11,9 +11,7 @@ export default function Board() {
   const { socket } = useSocket();
   const {
     board,
-    resetGame,
     selectSquare,
-    turnColor,
     possibleMoves,
     playerColor,
     setPlayerColor,
@@ -70,7 +68,7 @@ export default function Board() {
   const boardView = board.slice();
   if (playerColor !== "black") boardView.reverse();
   return (
-    <>
+    <div className="mx-2 border-orange-900 border-8">
       <div
         className={`grid grid-cols-8`}
         style={{ width: boardSize, height: boardSize, margin: "auto" }}
@@ -97,12 +95,6 @@ export default function Board() {
           return whiteView;
         })}
       </div>
-      <div className="flex justify-center">
-        <button onClick={resetGame} className="m-2 p-2 bg-blue-500 text-white">
-          Reset
-        </button>
-        <p>{turnColor} to play</p>
-      </div>
-    </>
+    </div>
   );
 }

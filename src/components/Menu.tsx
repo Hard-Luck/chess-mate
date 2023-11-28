@@ -4,6 +4,7 @@ import { useSocket } from "@/hooks/useSocket";
 import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ThemeDropDown from "./ThemeDropDown";
+import CopyUrlButton from "./CopyUrlButton";
 
 export default function Menu() {
   const { socket, joinRoom } = useSocket();
@@ -40,11 +41,13 @@ export default function Menu() {
   }
 
   return (
-    <div>
-      <p>{roomId}</p>
-      <div className="bg-green-500">
-        <button onClick={startGame}>start game</button>
-      </div>
+    <div className="bg-black rounded-lg border-blue-300 border-8 text-white flex flex-col max-h-64 p-2">
+      <button
+        className="bg-green-500 text-center rounded-lg m-2 p-2 "
+        onClick={startGame}>
+        start game
+      </button>
+      <CopyUrlButton />
       <ThemeDropDown />
     </div>
   );
