@@ -5,6 +5,7 @@ import GameContext from "./GameContext"; // Path to your GameContext
 import { useSearchParams } from "react-router-dom";
 import { useSocket } from "@/hooks/useSocket";
 import { PositionFile, PositionRank } from "@/classes/position";
+
 type MoveType = {
   toFile: PositionFile;
   toRank: PositionRank;
@@ -52,25 +53,23 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     });
   }
   function selectSquare(e: React.MouseEvent) {
+    if (game.turnColor !== playerColor) return;
     const square = (e.target as HTMLElement).dataset.location;
     if (!square) return;
     const position = Position.from(square[0], square[1]);
     const piece = game.getPieceAtPosition(position);
-    if (selectedSquare === null) {
-      if (piece?.pieceColor === game.turnColor) {
-        setSelectedSquare(position);
-        const possibleMoves =
-          game.possibleMovesFor(piece) || ([] as Position[]);
-        const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
-          (acc, curr) => {
-            const index = `${curr.currentFile}${curr.currentRank}` as string;
-            acc[index] = true;
-            return acc;
-          },
-          {}
-        );
-        setPossibleMoves(movesIndexes);
-      }
+    if (selectedSquare === null || piece?.pieceColor === game.turnColor) {
+      setSelectedSquare(position);
+      const possibleMoves = game.possibleMovesFor(piece) || ([] as Position[]);
+      const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
+        (acc, curr) => {
+          const index = `${curr.currentFile}${curr.currentRank}` as string;
+          acc[index] = true;
+          return acc;
+        },
+        {}
+      );
+      setPossibleMoves(movesIndexes);
     } else {
       makeMoveAndBroadcast(selectedSquare, position);
     }
@@ -96,7 +95,6 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
-  // Context value that will be provided to the children
   const contextValue = {
     game,
     setGame,
