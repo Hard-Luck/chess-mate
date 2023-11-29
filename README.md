@@ -24,12 +24,11 @@ To set up your local development environment:
 2. Node.js 20+
 
 ### GitHub Repository: [Chess Mate on GitHub](https://github.com/hard-luck/chess-mate)
+### Hosted at [Chess Mate on Vercel](https://chess-mate.vercel.app/)
 
 ### Features
 
-1. Practice Mode: Load custom board positions for practicing specific scenarios.
-2. Move Reversal: Experiment with different strategies by reversing moves.
-3. Online Play: Challenge friends or other players online for a match.
+- Online Play: Challenge friends by copying the room's URL and start a game. A random game URL is generated when you open the site.
 
 #### Progress
 
