@@ -1,3 +1,5 @@
+import { Button, buttonVariants } from "./ui/button";
+
 function CopyUrlButton() {
   const url = window.location.href;
 
@@ -14,11 +16,11 @@ function CopyUrlButton() {
 
   return (
     <div>
-      <button
-        className="bg-orange-500 text-center rounded-lg m-2 p-2 "
+      <Button
+        className={buttonVariants({ variant: "secondary" })}
         onClick={handleCopy}>
         Copy Game Invite URL
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,24 +1,34 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ThemeType } from "@/contexts/ThemeProvider";
 import { useTheme } from "@/hooks/useTheme";
+import { Label } from "./ui/label";
 
 export default function ThemeDropDown() {
-  const { setTheme, themeChoices, currentTheme } = useTheme();
+  const { currentTheme, setTheme, themeChoices } = useTheme();
   return (
-    <div className="flex flex-col">
-      <label className="text-center" htmlFor="theme">
-        Pick theme
-      </label>
-      <select
-        id="theme"
-        className="bg-green-500 text-center rounded-lg m-2 p-2 "
+    <Select onValueChange={(value) => setTheme(value as ThemeType)}>
+      <Label htmlFor="theme-choice">Select Theme</Label>
+      <SelectTrigger
+        id="theme-choice"
         defaultValue={currentTheme}
-        onChange={(e) => setTheme(e.target.value as ThemeType)}>
-        {themeChoices.map((choice) => (
-          <option className="text-end" key={choice} value={choice}>
-            {choice}
-          </option>
-        ))}
-      </select>
-    </div>
+        className="w-[180px] text-black">
+        <SelectValue placeholder="Theme" />
+      </SelectTrigger>
+      <SelectContent>
+        {themeChoices.map((theme) => {
+          return (
+            <SelectItem value={theme} key={theme}>
+              {theme}
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 }

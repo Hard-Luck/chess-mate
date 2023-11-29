@@ -3,7 +3,7 @@ import Board from "@/components/Board";
 import GameInfo from "@/components/GameInfo";
 
 function Multiplayer() {
-  const imgUrl = "/chessboard-background.jpg";
+  const imgUrl = "/chess-bg-black.jpg";
   return (
     <main
       className="bg-fixed bg-center bg-cover h-screen w-full"

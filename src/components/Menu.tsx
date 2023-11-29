@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ThemeDropDown from "./ThemeDropDown";
 import CopyUrlButton from "./CopyUrlButton";
+import { Button } from "./ui/button";
 
 export default function Menu() {
   const { socket, joinRoom } = useSocket();
@@ -41,12 +42,8 @@ export default function Menu() {
   }
 
   return (
-    <div className="bg-black rounded-lg border-blue-300 border-8 text-white flex flex-col max-h-64 p-2">
-      <button
-        className="bg-green-500 text-center rounded-lg m-2 p-2 "
-        onClick={startGame}>
-        start game
-      </button>
+    <div className="bg-black rounded-lg text-white flex flex-col max-h-64 p-2 gap-2">
+      <Button onClick={startGame}>Start game</Button>
       <CopyUrlButton />
       <ThemeDropDown />
     </div>
