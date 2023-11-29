@@ -41,6 +41,7 @@ function Square({ file, rank, piece, size, selected }: SquareProps) {
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
+      pointerEvents: "none",
     };
   }
 

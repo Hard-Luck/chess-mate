@@ -57,7 +57,12 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     if (!square) return;
     const position = Position.from(square[0], square[1]);
     const piece = game.getPieceAtPosition(position);
-    if (selectedSquare === null || piece?.pieceColor === game.turnColor) {
+    if (
+      (selectedSquare === null &&
+        piece?.pieceColor !==
+          (game.turnColor === "white" ? "black" : "white")) ||
+      piece?.pieceColor === game.turnColor
+    ) {
       setSelectedSquare(position);
       const possibleMoves = game.possibleMovesFor(piece) || ([] as Position[]);
       const movesIndexes = possibleMoves.reduce<Record<string, boolean>>(
@@ -69,7 +74,7 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
         {}
       );
       setPossibleMoves(movesIndexes);
-    } else {
+    } else if (selectedSquare) {
       makeMoveAndBroadcast(selectedSquare, position);
     }
   }
