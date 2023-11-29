@@ -248,7 +248,7 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
     const to = this.to || this.potentialMove;
     if (!to) return false;
     const { file, rank } = this.from.distanceFrom(to);
-    if (rank !== 0) return false; // Ensure move is horizontal
+    if (rank !== 0) return false;
     const direction = file > 0 ? 1 : -1;
     const startFile = this.from.currentFile;
     const currentRank = this.from.currentRank;
@@ -259,16 +259,15 @@ export class HorizontalMoveValidator extends MoveValidator<Rook | Queen> {
       const pieceOnSquare = this.board.getPieceFromPosition(
         new Position(fileToCheck, currentRank)
       );
-      if (pieceOnSquare) return false; // Block if there's a piece in between
+      if (pieceOnSquare) return false;
     }
 
-    // Check the square at the destination
     const pieceOnDestination = this.board.getPieceFromPosition(to);
     if (
       pieceOnDestination &&
       pieceOnDestination.pieceColor === this.piece.pieceColor
     ) {
-      return false; // Block if destination has a piece of the same color
+      return false;
     }
 
     return true;
@@ -420,7 +419,7 @@ export class ValidatorFactory {
     } else if (piece.type === "bishop") {
       return new DiagonalMoveValidator(board, piece as Bishop, to);
     } else if (piece.type === "queen") {
-      return new QueenMoveValidator(board, piece as Queen, to); // Assuming you have a QueenMoveValidator
+      return new QueenMoveValidator(board, piece as Queen, to);
     } else if (piece.type === "king") {
       return new KingMoveValidator(board, piece as King, to);
     } else {

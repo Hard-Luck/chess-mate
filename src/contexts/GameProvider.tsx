@@ -1,7 +1,7 @@
 import React, { useState, PropsWithChildren } from "react";
 import Game from "@/classes/game";
 import Position from "@/classes/position";
-import GameContext from "./GameContext"; // Path to your GameContext
+import GameContext from "./GameContext";
 import { useSearchParams } from "react-router-dom";
 import { useSocket } from "@/hooks/useSocket";
 import { PositionFile, PositionRank } from "@/classes/position";
@@ -36,7 +36,6 @@ const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setPlayerColor(color);
     }
   }
-  // Reset game function
   const resetGame = () => {
     const newGame = new Game();
     setBoard(() => newGame.state);
